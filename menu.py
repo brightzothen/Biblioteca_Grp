@@ -114,7 +114,8 @@ class GestorBiblioteca:
         self.a = GestorArchivo('libros.json')
         self.biblioteca = met.Biblioteca(self.a.leer_archivo()) #mecoge la clase biblioteca con la lectura del archivo
         self.ui = Utiles() #Antiguo utiles
-        self.user = GestorArchivo('usuarios.json')
+        self.us = GestorArchivo('usuarios.json')
+        self.usuario = met.Usuarios(self.us.leer_archivo()) #mecoge la clase usuarios con la lectura del archivo
         
 
     def menu_principal(self):
