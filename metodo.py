@@ -7,7 +7,8 @@ import menu as m
 # CLASE LIBRO
 # =====================================================
 class Libro:
-    def __init__(self, titulo, autor, genero, paginas, leido=False):
+    def __init__(self, ISBN, titulo, autor, genero, paginas, leido=False):
+        self.idLib = ISBN.strip()
         self.titulo = titulo.strip()
         self.autor = autor.strip()
         self.genero = genero.strip().lower()
@@ -20,6 +21,19 @@ class Libro:
 
     def alternar_estado(self):
         self.leido = not self.leido
+
+class Usuarios:
+    def __init__(self, id_user, nombre, email, Biblioteca=None):
+        self.idUser = id_user
+        self.nombre = nombre.strip()
+        self.email = email.strip()
+        
+        if Biblioteca is None:
+                self.libros = []
+        else:
+                self.libros = Biblioteca
+                self.ui = m.Utiles() #Antiguo utiles
+
 
 # 
 #                                           Lista de funciones programadas en este módulo:

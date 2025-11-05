@@ -8,7 +8,8 @@ import json
 
 class GestorArchivo:
     
-    def __init__(self, ruta_archivo='libros.json'):
+    # def __init__(self, ruta_archivo='libros.json'):
+    def __init__(self, ruta_archivo):
         self.ruta_archivo = Path(ruta_archivo)
         self.ui = Utiles()
         
@@ -110,9 +111,10 @@ Gestor de Biblioteca Personal:
 
 class GestorBiblioteca:
     def __init__(self):
-        self.a = GestorArchivo()
+        self.a = GestorArchivo('libros.json')
         self.biblioteca = met.Biblioteca(self.a.leer_archivo()) #mecoge la clase biblioteca con la lectura del archivo
         self.ui = Utiles() #Antiguo utiles
+        self.user = GestorArchivo('usuarios.json')
         
 
     def menu_principal(self):
