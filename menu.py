@@ -108,7 +108,7 @@ Gestor de Biblioteca Personal:
     @staticmethod
     def validar_datos_user(nombre, email):
         print('\nConfirme que quiere introducir la siguiente entrada a la Biblioteca personal:')
-        print(f'Título: {titulo}, autor: {autor}, género: {genero}, # de páginas: {paginas}.\n')
+        print(f'Nombre: {nombre}, E-mail: {email}.\n')
         respuesta = input('Confirme (y/n): ').strip().lower()
         return respuesta == 'y'
 
@@ -191,13 +191,6 @@ class GestorBiblioteca:
                         'stock': stock,
                         'leído': leido
                     }
-                    nom = input('\nIntroduzca el nombre del usuario: ')
-                    email = input('Introduzca el email del usuario: ')
-                    if self.usuario.en_usuarios ( nom ) == -1: # comprobamos que el libro no esté en nuestra biblioteca ya.
-                        if self.ui.validar_datos(nom, email): #ideas
-
-
-
                     self.biblioteca.agregar_libro(libro)
                     self.a.actualizar_archivo(self.biblioteca.libros)
                 else:
