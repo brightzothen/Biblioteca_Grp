@@ -50,6 +50,15 @@ class Libro_user:
 
 
 class Usuarios:
+    def __init__(self, lista_de_users=None):
+
+            if lista_de_users is None:
+                self.users = []
+            else:
+                self.users = lista_de_users
+            # self.ui = m.Utiles() #Antiguo utiles
+
+class usuario:
     def __init__(self, id_user, nombre, email):
         self.idUser = id_user
         self.nombre = nombre.strip()
