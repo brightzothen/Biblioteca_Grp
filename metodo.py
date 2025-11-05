@@ -50,7 +50,7 @@ class Libro_user:
 
 
 class Usuarios:
-    def __init__(self, id_user, nombre, email, Biblioteca=None):
+    def __init__(self, id_user, nombre, email):
         self.idUser = id_user
         self.nombre = nombre.strip()
         self.email = email.strip()
@@ -79,8 +79,8 @@ class Usuarios:
             return pos
 
         i = 0
-        for libro in self.libros:
-            if ( libro['título'].strip().lower() == titulo ) :
+        for us in self.libros:
+            if ( us['nombre'].strip().lower() == nombre ) :
                 pos = i
                 break
             else:

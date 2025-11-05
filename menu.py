@@ -98,6 +98,20 @@ Gestor de Biblioteca Personal:
         respuesta = input('Confirme (y/n): ').strip().lower()
         return respuesta == 'y'
 
+    @staticmethod
+    def validar_datos_lib(titulo, autor, genero, paginas, stock):
+        print('\nConfirme que quiere introducir la siguiente entrada a la Biblioteca personal:')
+        print(f'Título: {titulo}, autor: {autor}, género: {genero}, # de páginas: {paginas}.\n')
+        respuesta = input('Confirme (y/n): ').strip().lower()
+        return respuesta == 'y'
+
+    @staticmethod
+    def validar_datos_user(nombre, email):
+        print('\nConfirme que quiere introducir la siguiente entrada a la Biblioteca personal:')
+        print(f'Título: {titulo}, autor: {autor}, género: {genero}, # de páginas: {paginas}.\n')
+        respuesta = input('Confirme (y/n): ').strip().lower()
+        return respuesta == 'y'
+
 
 
 # =====================================================
@@ -157,6 +171,7 @@ class GestorBiblioteca:
         autor = input('Introduzca el autor de la obra: ')
         genero = input('Introduzca el género de la obra: ').strip().lower()
         paginas = self.ui.pedir_entero('Introduzca el número de páginas de la obra: ',1,None)
+        stock = self.ui.pedir_entero('Introduzca el número de copias de la obra: ',1,None)
         leido = False
 
 
@@ -165,7 +180,7 @@ class GestorBiblioteca:
             return
         else:
             if self.biblioteca.en_biblioteca ( titulo ) == -1: # comprobamos que el libro no esté en nuestra biblioteca ya.
-                if self.ui.validar_datos(titulo, autor, genero, paginas): #ideas
+                if self.ui.validar_datos(titulo, autor, genero, stock, paginas): #ideas
                     print(f'Añadiendo {titulo} a la biblioteca personal.')
 
                     libro = {
@@ -173,8 +188,15 @@ class GestorBiblioteca:
                         'autor': autor,
                         'género': genero,
                         'páginas': paginas,
+                        'stock': stock,
                         'leído': leido
                     }
+                    nom = input('\nIntroduzca el nombre del usuario: ')
+                    email = input('Introduzca el email del usuario: ')
+                    if self.usuario.en_usuarios ( nom ) == -1: # comprobamos que el libro no esté en nuestra biblioteca ya.
+                        if self.ui.validar_datos(nom, email): #ideas
+
+
 
                     self.biblioteca.agregar_libro(libro)
                     self.a.actualizar_archivo(self.biblioteca.libros)
