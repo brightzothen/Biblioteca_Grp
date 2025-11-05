@@ -1,0 +1,109 @@
+[
+  {
+    "título": "El Mesías de Dune",
+    "autor": "Herbert",
+    "género": "ciencia ficción",
+    "páginas": 350,
+    "leído": false,
+    "leido": true
+  },
+  {
+    "título": "Dios Emperador de Dune",
+    "autor": "herbert",
+    "género": "ciencia ficción",
+    "páginas": 515,
+    "leído": false
+  },
+  {
+    "título": "Dune",
+    "autor": "Herbert",
+    "género": "ciencia ficción",
+    "páginas": 895,
+    "leído": true,
+    "leido": true
+  },
+  {
+    "título": "Hijos de Dune",
+    "autor": "Herbert",
+    "género": "ciencia ficción",
+    "páginas": 450,
+    "leído": true
+  },
+  {
+    "título": "Intrigas y Deseos",
+    "autor": "p.d.james",
+    "género": "novela negra",
+    "páginas": 520,
+    "leído": false
+  },
+  {
+    "título": "el pequeño príncipe",
+    "autor": "saint-exupéry",
+    "género": "ciencia ficción",
+    "páginas": 117,
+    "leído": true
+  },
+  {
+    "título": "El Señor de los Anillos",
+    "autor": "J.R.R. Tolkien",
+    "género": "fantasía",
+    "páginas": 1450,
+    "leído": false
+  },
+  {
+    "título": "Lo que el Viento se Llevó",
+    "autor": "Margaret Mitchell",
+    "género": "drama",
+    "páginas": 915,
+    "leído": false
+  },
+  {
+    "título": "Miguel Strogoff",
+    "autor": "Julio Verne",
+    "género": "drama",
+    "páginas": 425,
+    "leído": false
+  },
+  {
+    "título": "Sin Noticias de Gurb",
+    "autor": "Eduardo Mendoza",
+    "género": "ciencia ficción",
+    "páginas": 270,
+    "leído": false
+  },
+  {
+    "título": "La Ciudad de la Alegría",
+    "autor": "Eduardo Mendoza",
+    "género": "novela negra",
+    "páginas": 310,
+    "leído": false
+  },
+  {
+    "título": "Dragon Wing",
+    "autor": "Weis & Hickman",
+    "género": "fantasía",
+    "páginas": 476,
+    "leído": true
+  },
+  {
+    "título": "Elven Star",
+    "autor": "Weis & Hickman",
+    "género": "fantasía",
+    "páginas": 490,
+    "leído": false
+  },
+  {
+    "título": "Fire Sea",
+    "autor": "Weis & Hickman",
+    "género": "fantasía",
+    "páginas": 468,
+    "leído": false
+  },
+  {
+    "título": "mar",
+    "autor": "mar",
+    "género": "drama",
+    "páginas": 134,
+    "leído": false
+  }
+]
