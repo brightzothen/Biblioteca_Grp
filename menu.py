@@ -8,7 +8,8 @@ import json
 
 class GestorArchivo:
     
-    def __init__(self, ruta_archivo='libros.json'):
+    # def __init__(self, ruta_archivo='libros.json'):
+    def __init__(self, ruta_archivo):
         self.ruta_archivo = Path(ruta_archivo)
         self.ui = Utiles()
         
@@ -97,6 +98,14 @@ Gestor de Biblioteca Personal:
         print(f'Título: {titulo}, autor: {autor}, género: {genero}, ISBN: {isbn}, unidades disponibles: {stock}.\n')
         respuesta = input('Confirme (y/n): ').strip().lower()
         return respuesta == 'y'
+   
+
+    @staticmethod
+    def validar_datos_user(nombre, email):
+        print('\nConfirme que quiere introducir la siguiente entrada a la Biblioteca personal:')
+        print(f'Nombre: {nombre}, E-mail: {email}.\n')
+        respuesta = input('Confirme (y/n): ').strip().lower()
+        return respuesta == 'y'
 
 
 
@@ -111,9 +120,11 @@ Gestor de Biblioteca Personal:
 
 class GestorBiblioteca:
     def __init__(self):
-        self.a = GestorArchivo()
+        self.a = GestorArchivo('libros.json')
         self.biblioteca = met.Biblioteca(self.a.leer_archivo()) #mecoge la clase biblioteca con la lectura del archivo
         self.ui = Utiles() #Antiguo utiles
+        self.us = GestorArchivo('usuarios.json')
+        self.usuario = met.Usuarios(self.us.leer_archivo()) #mecoge la clase usuarios con la lectura del archivo
         
 
     def menu_principal(self):
@@ -173,7 +184,6 @@ class GestorBiblioteca:
                         'ISBN': isbn,
                         'stock': stock
                     }
-
                     self.biblioteca.agregar_libro(libro)
                     self.a.actualizar_archivo(self.biblioteca.libros)
                 else:

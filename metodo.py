@@ -20,6 +20,79 @@ class Libro:
     # def alternar_estado(self):
         # self.leido = not self.leido
 
+class Libro_user:
+    def __init__(self, ISBN, titulo, autor, genero, paginas, stock, leido=False):
+        self.idLib = ISBN.strip()
+        self.titulo = titulo.strip()
+        self.autor = autor.strip()
+        self.genero = genero.strip().lower()
+        self.paginas = paginas
+        self.stock = stock
+        self.leido = leido
+
+    def __str__(self):
+        estado = "leído" if self.leido else "no leído"
+        return f"{self.titulo} de {self.autor} ({self.genero}) - {self.paginas} págs., {estado} (ID: {self.id_libro}, Stock: {self.stock})"
+
+
+    def alternar_estado(self):
+        self.leido = not self.leido
+  
+    def hay_stock(self):
+        return self.stock > 0
+
+    def reservar(self):
+        if self.hay_stock():
+            self.stock -= 1
+            return True
+        return False
+
+
+class Usuarios:
+    def __init__(self, lista_de_users=None):
+
+            if lista_de_users is None:
+                self.users = []
+            else:
+                self.users = lista_de_users
+            # self.ui = m.Utiles() #Antiguo utiles
+
+class Usuario:
+    def __init__(self, id_user, nombre, email):
+        self.idUser = id_user
+        self.nombre = nombre.strip()
+        self.email = email.strip()
+
+    def __str__(self):
+        return f"{self.idUser} de {self.nombre} ({self.email})"
+
+    
+    # # Añadir un usuario
+    # def agregar_user(self, user):
+    #     if self.en_usuarios(user['nombre']) == -1:
+    #         self.libros.append(user)
+    #         print(f'Libro "{user["nombre"]}" agregado a usuarios.')
+    #     else:
+    #         print(f'Error: el usuario "{user["nombre"]}" ya existe en usuarios.')
+
+
+    # def en_usuarios ( self, nombre ):
+    #     # el título es una cadena y la lista_de_libros es una lista de diccionarios con clave 'título' que habrá que recorrer.
+    #     # la función devuelve -1 si el libro no está en la lista de libros o el índice con su posición el la lista si está presente.
+    #     pos = -1
+    #     if not self.libros:
+    #         return pos
+
+    #     i = 0
+    #     for us in self.libros:
+    #         if ( us['nombre'].strip().lower() == nombre ) :
+    #             pos = i
+    #             break
+    #         else:
+    #             i += 1
+    #     return pos
+
+
 # 
 #                                           Lista de funciones programadas en este módulo:
 #                                           ==============================================
