@@ -23,6 +23,7 @@ class Usuario:
         self.idUser = id_user
         self.nombre = nombre.strip()
         self.email = email.strip()
+        self.libros_en_prestamo = []
 
     def __str__(self):
         return f"{self.idUser} de {self.nombre} ({self.email})"
