@@ -59,7 +59,7 @@ Gestor de Biblioteca Personal:
 2.- Eliminar Libro.
 3.- Editar/Modificar Libro.
 4.- Buscar Libro.
-5.- Mostrar Estadísticas.
+5.- Préstamo de Libro.
 6.- Salir del Gestor.
           ''')   
     
@@ -135,7 +135,7 @@ class GestorBiblioteca:
                     self.biblioteca.buscar_libro()
 
                 case 5:
-                    self.biblioteca.estadisticas_biblioteca()
+                    pass
                 case 6:
                     print('\nGracias por usar el Gestor de Biblioteca Personal. Guardando el archivo. ¡Hasta la próxima!\n')
                     self.a.actualizar_archivo(self.biblioteca.libros)
