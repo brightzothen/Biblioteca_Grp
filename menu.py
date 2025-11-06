@@ -279,7 +279,6 @@ class GestorBiblioteca:
         # Por convención hemos decidido que sólo se podrán modificar los datos de un usuario en referencia a sus préstamos mediante "hacer_prestamo" y "hacer_devolucion"
         # Y como mucho un usuario podrá tener 3 libros prestados.
 
-        self.ui.limpiar_pantalla()
         nombre = input('\nIntroduzca el nombre del usuario que solicita el préstamo: ').strip().lower()
         if not nombre:
             self.ui.error('el nombre no puede ser una cadena vacía.')
@@ -288,22 +287,8 @@ class GestorBiblioteca:
             if indice < 0:
                 self.ui.error('el usuario no se encuentra en la biblioteca.')
             else:
-                if ( len(self.usuario.users[indice].libros_en_prestamo) ) > 2:
-                    self.ui.error('el usuario ya tiene 3 libros en préstamo, no puede tener más.')
-                else:
-                    titulo = input('\nIntroduzca el título de la obra a editar: ').strip().lower()
-                    if not titulo:
-                        self.ui.error('el título del libro no puede ser una cadena vacía.')
-                    else:
-                        ind = self.biblioteca.en_biblioteca( titulo)
-                        if ind < 0:
-                            self.ui.error('el libro no se encuentra en la biblioteca.')
-                        else:
-                            if ( self.biblioteca.libros[ind]['stock'] ) < 1:
-                                self.ui.error('no quedan ejemplares del libro disponibles.')
-                            else:
-                                self.biblioteca.libros[ind]['stock'] -= 1  # restamos un ejemplar del stock de la biblioteca.
-                                self.usuario.users[indice].libros_en_prestamo.append(self.biblioteca.libros[ind]['título'])
+                mod = self.usuario.hacer_prestamo(indice)
+                
 
 if __name__ == "__main__":
     gestor = GestorBiblioteca()
