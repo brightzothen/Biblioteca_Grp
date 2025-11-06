@@ -59,7 +59,7 @@ Gestor de Biblioteca Personal:
 2.- Eliminar Libro.
 3.- Editar/Modificar Libro.
 4.- Buscar Libro.
-5.- Mostrar Estadísticas.
+5.- Préstamo de Libro.
 6.- Salir del Gestor.
           ''')   
     
@@ -73,7 +73,8 @@ Gestor de Biblioteca Personal:
     1.- Por título.
     2.- Por autor.
     3.- Por género.
-    4.- Salir del menú de búsquedas.
+    4.- Por ISBN.
+    5.- Salir del menú de búsquedas.
             ''')
 
 
@@ -91,9 +92,9 @@ Gestor de Biblioteca Personal:
                 print('Introduce un número válido.')
 
     @staticmethod
-    def validar_datos(titulo, autor, genero, paginas):
+    def validar_datos(titulo, autor, genero, isbn, stock):
         print('\nConfirme que quiere introducir la siguiente entrada a la Biblioteca personal:')
-        print(f'Título: {titulo}, autor: {autor}, género: {genero}, # de páginas: {paginas}.\n')
+        print(f'Título: {titulo}, autor: {autor}, género: {genero}, ISBN: {isbn}, unidades disponibles: {stock}.\n')
         respuesta = input('Confirme (y/n): ').strip().lower()
         return respuesta == 'y'
 
@@ -134,7 +135,7 @@ class GestorBiblioteca:
                     self.biblioteca.buscar_libro()
 
                 case 5:
-                    self.biblioteca.estadisticas_biblioteca()
+                    pass
                 case 6:
                     print('\nGracias por usar el Gestor de Biblioteca Personal. Guardando el archivo. ¡Hasta la próxima!\n')
                     self.a.actualizar_archivo(self.biblioteca.libros)
@@ -153,8 +154,8 @@ class GestorBiblioteca:
         titulo = input('\nIntroduzca el título de la obra: ')
         autor = input('Introduzca el autor de la obra: ')
         genero = input('Introduzca el género de la obra: ').strip().lower()
-        paginas = self.ui.pedir_entero('Introduzca el número de páginas de la obra: ',1,None)
-        leido = False
+        isbn = self.ui.pedir_entero('Introduzca el ISBN de la obra: ',1,None)
+        stock = self.ui.pedir_entero('Introduzca las unidades en biblioteca: ',1,None)
 
 
         if not titulo or not autor or not genero:
@@ -162,15 +163,15 @@ class GestorBiblioteca:
             return
         else:
             if self.biblioteca.en_biblioteca ( titulo ) == -1: # comprobamos que el libro no esté en nuestra biblioteca ya.
-                if self.ui.validar_datos(titulo, autor, genero, paginas): #ideas
+                if self.ui.validar_datos(titulo, autor, genero, isbn, stock): #ideas
                     print(f'Añadiendo {titulo} a la biblioteca personal.')
 
                     libro = {
                         'título': titulo,
                         'autor': autor,
                         'género': genero,
-                        'páginas': paginas,
-                        'leído': leido
+                        'ISBN': isbn,
+                        'stock': stock
                     }
 
                     self.biblioteca.agregar_libro(libro)
@@ -179,19 +180,19 @@ class GestorBiblioteca:
                     print('Entrada descartada.')
             else:
                 self.ui.error(' el libro ya está en la biblioteca, no se puede añadir otra instancia nueva.')
-        self.ui.esperar_input()
+        # self.ui.esperar_input()
 
              
    
     def eliminar_libro(self):
         indice = self.biblioteca.eliminar_libro()
         if indice < 0:
-            self.ui.error('el libro no se puede eliminar, no está en la biblioteca.')
+            self.ui.error('El libro no se ha podido eliminar.')
         else:
             print(f'\nEliminando {self.biblioteca.libros[indice]['título']} de la biblioteca.')
             del(self.biblioteca.libros[indice])
             self.a.actualizar_archivo(self.biblioteca.libros)
-        self.ui.esperar_input()
+        # self.ui.esperar_input()
 
     def modificar_libro(self):
         titulo = input('\nIntroduzca el título de la obra a editar: ').strip().lower()
@@ -208,7 +209,7 @@ class GestorBiblioteca:
                 else:
                     self.a.actualizar_archivo(self.biblioteca.libros)
                     print('Entrada modificada y actualizada en el archivo.')
-        self.ui.esperar_input()
+        # self.ui.esperar_input()
 
 if __name__ == "__main__":
     gestor = GestorBiblioteca()

@@ -7,19 +7,18 @@ import menu as m
 # CLASE LIBRO
 # =====================================================
 class Libro:
-    def __init__(self, titulo, autor, genero, paginas, leido=False):
+    def __init__(self, titulo, autor, genero, isbn, stock):
         self.titulo = titulo.strip()
         self.autor = autor.strip()
         self.genero = genero.strip().lower()
-        self.paginas = paginas
-        self.leido = leido
+        self.isbn = isbn
+        self.stock = stock
 
     def __str__(self):
-        estado = "leído" if self.leido else "no leído"
-        return f"{self.titulo} de {self.autor} ({self.genero}) - {self.paginas} págs., {estado}"
+        return f"{self.titulo} de {self.autor} ({self.genero}) - ID: {self.isbn}, disponibles: {self.stock}"
 
-    def alternar_estado(self):
-        self.leido = not self.leido
+    # def alternar_estado(self):
+        # self.leido = not self.leido
 
 # 
 #                                           Lista de funciones programadas en este módulo:
@@ -36,7 +35,7 @@ class Libro:
 #                       ([str generos])               buscar_generos        ( lista_diccionarios biblioteca )
 #                       (None)                        menu_buscar_libro     ( None )
 #                       (None)                        buscar_libro          ( lista_diccionarios biblioteca )
-#                       (None)                        mostrar_estadisticas  ( lista_diccionarios biblioteca )
+#                       (int posición)                isbn_en_biblioteca    ( lista_diccionarios biblioteca )
 
 
 class Biblioteca:
@@ -72,6 +71,21 @@ class Biblioteca:
             else:
                 i += 1
         return pos
+    
+    def isbn_en_biblioteca ( self, isbn ):
+        # el isbn es un entero y la lista_de_libros es una lista de diccionarios con clave 'ISBN' que habrá que recorrer.
+        # la función devuelve -1 si el libro no está en la lista de libros o el índice con su posición el la lista si está presente.
+        pos = -1
+        if self.libros:
+            i = 0
+            for libro in self.libros:
+                if ( libro['ISBN'] == isbn ) :
+                    pos = i
+                    break
+                else:
+                    i += 1
+        return pos
+
 
     def libros_por_autor (self, autor):
 
@@ -105,10 +119,10 @@ class Biblioteca:
 
     def eliminar_libro(self):
 
-        # Función que le pregunta al usuario el título o el autor de una obra dentro de [lista_de_libros]
+        # Función que le pregunta al usuario el título o el autor o el ISBN de una obra dentro de [lista_de_libros]
         # y retorna la posición del libro a buscar dentro de la lista o -1 en caso que no lo encuentre por los parámetros de búsqueda.
         posicion = -1
-        op = self.ui.pedir_entero('\n¿Cómo quiere buscar la obra? 1- por título, 2- por autor. ',1,2)
+        op = self.ui.pedir_entero('\n¿Cómo quiere buscar la obra?\n\n1- Por título\n2- Por autor\n3.- Por ISBN\n',1,3)
 
         match op:
             case 1:
@@ -137,7 +151,9 @@ class Biblioteca:
                             posicion = self.en_biblioteca( titulo_standard)
                         else:
                             self.ui.error('cancelación del borrado.')
-
+            case 3:
+                isbn = self.ui.pedir_entero('Introduzca el ISBN de la obra a eliminar del catálogo: ',1,None)
+                posicion = self.isbn_en_biblioteca(isbn)
             case _:
                 self.ui.error('inesperado borrando libro.')
 
@@ -153,8 +169,8 @@ class Biblioteca:
         1.- Modificar el título.
         2.- Modificar el autor.
         3.- Modificar el género.
-        4.- Modificar el número de páginas.
-        5.- Modificar el estado de lectura.
+        4.- Modificar el número de ISBN.
+        5.- Modificar el stock.
         6.- Salir de la modificación del libro.
                 ''')
 
@@ -196,18 +212,13 @@ class Biblioteca:
                     else:
                         self.ui.error('no se puede asignar una cadena vacía.')
                 case 4:
-                    paginas = self.ui.pedir_entero('\nIntroduzca el número de páginas del libro: ',1,None)
-                    self.libros[indice]['páginas'] = paginas
+                    isbn = self.ui.pedir_entero('\nIntroduzca el código ISBN del libro: ',1,None)
+                    self.libros[indice]['ISBN'] = isbn
                     modificado = True
                 case 5:
-                    if self.libros[indice]['leído']:
-                        print('\nModificando el estado del libro de "leído" a "no leído".' )
-                        self.libros[indice]['leído'] = False
-                        modificado = True
-                    else:
-                        print('\nModificando el estado del libro de "no leído" a "leído".' )
-                        self.libros[indice]['leído'] = True
-                        modificado = True
+                    stock = self.ui.pedir_entero('\nIntroduzca cuántas copias nuevas del libro han llegado: ',1,None)
+                    self.libros[indice]['stock'] += stock
+                    modificado = True
                 case 6:
                     salir = True
 
@@ -236,7 +247,7 @@ class Biblioteca:
         while not salir:
             self.ui.limpiar_pantalla()
             self.ui.menu_buscar_libro()
-            opcion = self.ui.pedir_entero('Escoja opción [1-4]: ',1,4)
+            opcion = self.ui.pedir_entero('Escoja opción [1-5]: ',1,5)
             match opcion:
 
                 case 1:
@@ -246,11 +257,7 @@ class Biblioteca:
                         if pos < 0:
                             self.ui.error('título no encontrado en la biblioteca.')
                         else:
-                            if self.libros[pos]['leído']:
-                                leido = 'leído'
-                            else:
-                                leido = 'no leído'
-                            print(f'\n{self.libros[pos]['título']}, escrito por {self.libros[pos]['autor']}: {leido}.')
+                            print(f'\n{self.libros[pos]['título']}, escrito por {self.libros[pos]['autor']}, ISBN: {self.libros[pos]['ISBN']} stock: {self.libros[pos]['stock']}.')
                     else:
                         self.ui.error('no se puede asignar una cadena vacía.')
                 case 2:
@@ -260,11 +267,7 @@ class Biblioteca:
                         print(f'\nLos libros encontrados en la biblioteca de {autor} son:')
                         print(f'============================================{'='*len(autor)}====\n')
                         for i, libro in enumerate(libros):
-                            if libro['leído']:
-                                leido = 'leído'
-                            else:
-                                leido = 'no leído'
-                            print(f'{i+1} - {libro['título']}, {leido}.')    
+                            print(f'{i+1} - {libro['título']}, ISBN: {libro['ISBN']}, stock: {libro['stock']}.')    
                     else:
                         self.ui.error('no se puede asignar una cadena vacía.')
                 case 3:
@@ -279,43 +282,25 @@ class Biblioteca:
                         print(f'\nLos libros encontrados en la biblioteca del género {genero} son:')
                         print(f'===================================================={'='*len(genero)}====\n')
                         for i, libro in enumerate(libros):
-                            if libro['leído']:
-                                leido = 'leído'
-                            else:
-                                leido = 'no leído'
-                            print(f'{i+1} - {libro['título']} de {libro['autor']}, {leido}.')
+                            print(f'{i+1} - {libro['título']} de {libro['autor']}, ISBN: {libro['ISBN']} disponibles: {libro['stock']}.')
                     else:
                         self.ui.error('no se puede asignar una cadena vacía.')
                 case 4:
+                    isbn = self.ui.pedir_entero('Introduzca el ISBN del libro a buscar: ',1,None)
+                    pos = self.isbn_en_biblioteca(isbn)
+                    if pos < 0:
+                        self.ui.error('ISBN no presente en el catálogo de libros.')
+                    else:
+                        print(f'\n{self.libros[pos]['título']}, escrito por {self.libros[pos]['autor']}, stock: {self.libros[pos]['stock']}.')
+                case 5:
                     salir = True
 
-            if opcion in [1,2,3]:
+            if opcion in [1,2,3,4]:
                 self.ui.esperar_input()
 
 
     def generos_disponibles(self):
         return set(libro.genero for libro in self.libros)
 
-    def estadisticas_biblioteca(self):
-
-        # Función que tiene como entrada una biblioteca, esto es, una [lista_de_libros], donde cada libro es un diccionario con
-        # las llaves: título, autor, género, páginas y leído.
-        # Y muestra por pantalla los siguientes datos:
-        # Total de libros en la biblioteca, promedio de páginas y porcentaje de libros leídos/total_de_libros en la biblioteca.
-
-        if self.libros:
-            total_libros = len(self.libros)
-            promedio_paginas = 0
-            leidos = 0
-            for libro in self.libros:
-                promedio_paginas += libro['páginas']
-                if libro['leído']:
-                    leidos += 1
-            promedio_paginas /= total_libros
-            porcentaje = leidos * 100 / total_libros
-
-            print(f'\nLa biblioteca contiene {total_libros} libros, de los cuales has léido un {porcentaje:.2f}% y el promedio de páginas de todos los libros es de: {round(promedio_paginas)}')
-        else:
-            self.ui.error('no se pueden mostrar estadísticas, no hay biblioteca.')
 
 
