@@ -233,6 +233,7 @@ class GestorBiblioteca:
         nombre = input('\nIntroduzca el nombre del usuario: ')
         email = input('Introduzca el email  del usuario: ')
         idn = self.ui.pedir_entero('Introduzca el id del usuario: ',1,None)
+        prestamos = []
         
         if not nombre or not email:
             self.ui.error("Datos de entrada erróneos.")
@@ -245,7 +246,8 @@ class GestorBiblioteca:
                     userd = {
                         'nombre': nombre,
                         'email': email,
-                        'id_user': idn
+                        'id_user': idn,
+                        'libros_en_prestamo' : prestamos
                     }
                     self.usuario.agregar_user(userd)
                     self.us.actualizar_archivo(self.usuario.users)
