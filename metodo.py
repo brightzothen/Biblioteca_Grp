@@ -75,13 +75,12 @@ class Usuarios:
                 i += 1
         return pos
 
-    def modificar_usuario (self, indice ):
+    def modificar_usuario (self, indice):
         # Función que tiene como parámetros un índice que marca una posición en la [lista_de_libros]
         # Le pide al usuario una serie de datos para modificar dicha entrada den la lista y, si el proceso se lleva a cabo bien,
         # devuelve True y modifica la entrada en la lista, en caso contrario devuelve False.
 
-        modificado = False
-        
+        modificado = False        
 
         self.ui.limpiar_pantalla()
 
@@ -106,7 +105,24 @@ class Usuarios:
         return modificado
 
 
-    
+    def hacer_prestamo( self, indice, libros ):
+
+        if ( len(self.users[indice]['libros_en_prestamo']) ) > 2:
+                    self.ui.error('el usuario ya tiene 3 libros en préstamo, no puede tener más.')
+        else:
+                    titulo = input('\nIntroduzca el título de la obra a editar: ').strip().lower()
+                    if not titulo:
+                        self.ui.error('el título del libro no puede ser una cadena vacía.')
+                    else:
+                        ind = self.biblioteca.en_biblioteca( titulo)
+                        if ind < 0:
+                            self.ui.error('el libro no se encuentra en la biblioteca.')
+                        else:
+                            if ( self.biblioteca.libros[ind]['stock'] ) < 1:
+                                self.ui.error('no quedan ejemplares del libro disponibles.')
+                            else:
+                                self.biblioteca.libros[ind]['stock'] -= 1  # restamos un ejemplar del stock de la biblioteca.
+                                self.usuario.users[indice].libros_en_prestamo.append(self.biblioteca.libros[ind]['título'])
  
 
 
