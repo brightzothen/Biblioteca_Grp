@@ -57,6 +57,30 @@ class Usuarios:
                 self.users = lista_de_users
             # self.ui = m.Utiles() #Antiguo utiles
 
+   # # Añadir un usuario
+    def agregar_user(self, user):
+        if self.en_usuarios(user['nombre']) == -1:
+            self.users.append(user)
+            print(f'Usuario "{user["nombre"]}" agregado a usuarios.')
+        else:
+            print(f'Error: el usuario "{user["nombre"]}" ya existe en usuarios.')
+
+    def en_usuarios ( self, nombre ):
+        # el título es una cadena y la lista_de_libros es una lista de diccionarios con clave 'título' que habrá que recorrer.
+        # la función devuelve -1 si el libro no está en la lista de libros o el índice con su posición el la lista si está presente.
+        pos = -1
+        if not self.users:
+            return pos
+
+        i = 0
+        for us in self.users:
+            if ( us['nombre'].strip().lower() == nombre ) :
+                pos = i
+                break
+            else:
+                i += 1
+        return pos
+
 class Usuario:
     def __init__(self, id_user, nombre, email):
         self.idUser = id_user
@@ -67,30 +91,10 @@ class Usuario:
         return f"{self.idUser} de {self.nombre} ({self.email})"
 
     
-    # # Añadir un usuario
-    # def agregar_user(self, user):
-    #     if self.en_usuarios(user['nombre']) == -1:
-    #         self.libros.append(user)
-    #         print(f'Libro "{user["nombre"]}" agregado a usuarios.')
-    #     else:
-    #         print(f'Error: el usuario "{user["nombre"]}" ya existe en usuarios.')
+ 
 
 
-    # def en_usuarios ( self, nombre ):
-    #     # el título es una cadena y la lista_de_libros es una lista de diccionarios con clave 'título' que habrá que recorrer.
-    #     # la función devuelve -1 si el libro no está en la lista de libros o el índice con su posición el la lista si está presente.
-    #     pos = -1
-    #     if not self.libros:
-    #         return pos
 
-    #     i = 0
-    #     for us in self.libros:
-    #         if ( us['nombre'].strip().lower() == nombre ) :
-    #             pos = i
-    #             break
-    #         else:
-    #             i += 1
-    #     return pos
 
 
 # 

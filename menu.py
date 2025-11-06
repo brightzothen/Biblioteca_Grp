@@ -60,8 +60,11 @@ Gestor de Biblioteca Personal:
 2.- Eliminar Libro.
 3.- Editar/Modificar Libro.
 4.- Buscar Libro.
-5.- Préstamo de Libro.
-6.- Salir del Gestor.
+5.- Introducir Usuario.
+6.- Modificar Usuario.
+7.- Devolución de Libro.
+8.- Préstamo de Libro.
+9.- Salir del Gestor.
           ''')   
     
     @staticmethod     
@@ -146,7 +149,7 @@ class GestorBiblioteca:
                     self.biblioteca.buscar_libro()
 
                 case 5:
-                    pass
+                    self.agregar_user()
                 case 6:
                     print('\nGracias por usar el Gestor de Biblioteca Personal. Guardando el archivo. ¡Hasta la próxima!\n')
                     self.a.actualizar_archivo(self.biblioteca.libros)
@@ -220,6 +223,32 @@ class GestorBiblioteca:
                     self.a.actualizar_archivo(self.biblioteca.libros)
                     print('Entrada modificada y actualizada en el archivo.')
         # self.ui.esperar_input()
+
+    def agregar_user(self):
+        nombre = input('\nIntroduzca el nombre del usuario: ')
+        email = input('Introduzca el email  del usuario: ')
+        idn = self.ui.pedir_entero('Introduzca el id del usuario: ',1,None)
+        
+        if not nombre or not email:
+            self.ui.error("Datos de entrada erróneos.")
+            return
+        else:
+            if self.usuario.en_usuarios ( nombre ) == -1: # comprobamos que el usuario no esté en nuestra lista ya.
+                if self.ui.validar_datos_user(nombre, email): #ideas
+                    print(f'Añadiendo {nombre} a la lista de usuarios.')
+
+                    userd = {
+                        'nombre': nombre,
+                        'email': email,
+                        'id_user': idn
+                    }
+                    self.usuario.agregar_user(userd)
+                    self.us.actualizar_archivo(self.usuario.users)
+                else:
+                    print('Entrada descartada.')
+            else:
+                self.ui.error(' el usuario ya está en la biblioteca, no se puede añadir otra instancia nueva.')
+
 
 if __name__ == "__main__":
     gestor = GestorBiblioteca()
