@@ -135,7 +135,7 @@ class GestorBiblioteca:
         while not salir:
             self.ui.limpiar_pantalla()
             self.ui.mostrar_menu_principal()
-            opcion = self.ui.pedir_entero('Escoja opción [1-6]: ', 1, 6)
+            opcion = self.ui.pedir_entero('Escoja opción [1-9]: ', 1, 9)
 
 
             match opcion:
@@ -147,11 +147,16 @@ class GestorBiblioteca:
                     self.modificar_libro()
                 case 4:
                     self.biblioteca.buscar_libro()
-
                 case 5:
                     self.agregar_user()
                 case 6:
-                    print('\nGracias por usar el Gestor de Biblioteca Personal. Guardando el archivo. ¡Hasta la próxima!\n')
+                    self.modificar_usuario()
+                case 7:
+                    pass
+                case 8:
+                    pass
+                case 9:
+                    print('\nGracias por usar el Gestor de Biblioteca. Guardando el archivo. ¡Hasta la próxima!\n')
                     self.a.actualizar_archivo(self.biblioteca.libros)
                     salir = True
                 case _:
@@ -248,6 +253,23 @@ class GestorBiblioteca:
                     print('Entrada descartada.')
             else:
                 self.ui.error(' el usuario ya está en la biblioteca, no se puede añadir otra instancia nueva.')
+
+    def modificar_usuario(self):
+        nombre = input('\nIntroduzca el nombre del usuario a modificar: ').strip().lower()
+        if not nombre:
+            self.ui.error('el nombre no puede ser una cadena vacía.')
+        else:
+            indice = self.usuario.en_usuarios ( nombre)
+            if indice < 0:
+                self.ui.error('el usuario no se encuentra en la biblioteca.')
+            else:
+                mod = self.usuario.modificar_usuario( indice )
+                if not mod:
+                    self.ui.error('la entrada del usuario no ha sido modificada.')
+                else:
+                    self.us.actualizar_archivo(self.usuario.users)
+                    print('Entrada modificada y actualizada en el archivo.')
+        # self.ui.esperar_input()
 
 
 if __name__ == "__main__":

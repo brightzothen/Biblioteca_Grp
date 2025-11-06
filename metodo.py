@@ -17,45 +17,38 @@ class Libro:
     def __str__(self):
         return f"{self.titulo} de {self.autor} ({self.genero}) - ID: {self.isbn}, disponibles: {self.stock}"
 
-    # def alternar_estado(self):
-        # self.leido = not self.leido
 
-class Libro_user:
-    def __init__(self, ISBN, titulo, autor, genero, paginas, stock, leido=False):
-        self.idLib = ISBN.strip()
-        self.titulo = titulo.strip()
-        self.autor = autor.strip()
-        self.genero = genero.strip().lower()
-        self.paginas = paginas
-        self.stock = stock
-        self.leido = leido
+class Usuario:
+    def __init__(self, id_user, nombre, email):
+        self.idUser = id_user
+        self.nombre = nombre.strip()
+        self.email = email.strip()
 
     def __str__(self):
-        estado = "leído" if self.leido else "no leído"
-        return f"{self.titulo} de {self.autor} ({self.genero}) - {self.paginas} págs., {estado} (ID: {self.id_libro}, Stock: {self.stock})"
+        return f"{self.idUser} de {self.nombre} ({self.email})"
+    # def alternar_estado(self):
+
+        # self.leido = not self.leido
 
 
-    def alternar_estado(self):
-        self.leido = not self.leido
-  
-    def hay_stock(self):
-        return self.stock > 0
+    # def hay_stock(self):
+    #     return self.stock > 0
 
-    def reservar(self):
-        if self.hay_stock():
-            self.stock -= 1
-            return True
-        return False
+    # def reservar(self):
+    #     if self.hay_stock():
+    #         self.stock -= 1
+    #         return True
+    #     return False
 
 
 class Usuarios:
     def __init__(self, lista_de_users=None):
-
+        
             if lista_de_users is None:
                 self.users = []
             else:
                 self.users = lista_de_users
-            # self.ui = m.Utiles() #Antiguo utiles
+            self.ui = m.Utiles() #Antiguo utiles
 
    # # Añadir un usuario
     def agregar_user(self, user):
@@ -81,14 +74,36 @@ class Usuarios:
                 i += 1
         return pos
 
-class Usuario:
-    def __init__(self, id_user, nombre, email):
-        self.idUser = id_user
-        self.nombre = nombre.strip()
-        self.email = email.strip()
+    def modificar_usuario (self, indice ):
+        # Función que tiene como parámetros un índice que marca una posición en la [lista_de_libros]
+        # Le pide al usuario una serie de datos para modificar dicha entrada den la lista y, si el proceso se lleva a cabo bien,
+        # devuelve True y modifica la entrada en la lista, en caso contrario devuelve False.
 
-    def __str__(self):
-        return f"{self.idUser} de {self.nombre} ({self.email})"
+        modificado = False
+        
+
+        self.ui.limpiar_pantalla()
+
+        nombre_nuevo = input('\nIntroduzca el nuevo nombre: ').strip()
+        if nombre_nuevo:
+            self.users[indice]['nombre'] = nombre_nuevo
+            modificado = True
+        else:
+            self.ui.error('no se puede asignar una cadena vacía.')
+            
+        email_nuevo = input('\nIntroduzca el nuevo email: ').strip()
+        if email_nuevo:
+            self.users[indice]['email'] = email_nuevo
+            modificado = True
+        else:
+            self.ui.error('no se puede asignar una cadena vacía.')
+
+
+        id_nuevo = self.ui.pedir_entero('Introduzca el nuevo id: ', 1, None)
+        self.users[indice]['id_user'] = id_nuevo
+
+        return modificado
+
 
     
  
