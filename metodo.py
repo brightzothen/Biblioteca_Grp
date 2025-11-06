@@ -58,7 +58,7 @@ class Usuarios:
                 self.users = lista_de_users
             # self.ui = m.Utiles() #Antiguo utiles
 
-class usuario:
+class Usuario:
     def __init__(self, id_user, nombre, email):
         self.idUser = id_user
         self.nombre = nombre.strip()
