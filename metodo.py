@@ -1,97 +1,328 @@
 
 
-
 import os
-import menu as m
+import json
+from pathlib import Path
+
+class GArchivo_Usuario:
+    
+    def __init__(self, ruta_archivo = 'usuario.json'):
+        self.ruta_archivo = Path(ruta_archivo)
+        self.ui = Utiles()
+        
+    def leer_archivo (self):
+        lista_de_users = []
+
+        try:
+            with self.ruta_archivo.open('r', encoding='utf-8') as f:
+                lista_de_libros = json.load(f)
+        except FileNotFoundError:
+            self.ui.error('El archivo no existe.')
+        except PermissionError:
+            self.ui.error('No tienes permisos de acceso.')
+        except json.JSONDecodeError:
+            self.ui.error('El archivo contiene datos corruptos.')
+        return lista_de_users
+
+    def actualizar_archivo(self, lista_de_users):
+
+        if not lista_de_users:
+            val = 'w'
+        else:
+            val = 'a'
+
+        try:
+            with self.ruta_archivo.open(val, encoding='utf-8') as f:
+                json.dump(lista_de_users, f, ensure_ascii=False, indent=2)
+        except PermissionError:
+            self.ui.error('No tienes permisos de acceso.')
+
+class GestorArchivo:
+    
+    def __init__(self, ruta_archivo):
+        if ruta_archivo == 'libros.json':
+                self.ruta_archivo = Path(ruta_archivo)
+        else:
+            self.ruta_archivo = Path(ruta_archivo)
+
+        self.ui = Utiles()
+        
+    def leer_archivo (self):
+        lista_de_libros = []
+
+        try:
+            with self.ruta_archivo.open('r', encoding='utf-8') as f:
+                lista_de_libros = json.load(f)
+        except FileNotFoundError:
+            self.ui.error('El archivo no existe.')
+        except PermissionError:
+            self.ui.error('No tienes permisos de acceso.')
+        except json.JSONDecodeError:
+            self.ui.error('El archivo contiene datos corruptos.')
+        return lista_de_libros
+
+    def actualizar_archivo(self, lista_de_libros):
+
+        if not lista_de_libros:
+            val = 'w'
+        else:
+            val = 'a'
+
+        try:
+            with self.ruta_archivo.open('w', encoding='utf-8') as f:
+                json.dump(lista_de_libros, f, ensure_ascii=False, indent=2)
+        except PermissionError:
+            self.ui.error('No tienes permisos de acceso.')
+
+
+
+
 # =====================================================
 # CLASE LIBRO
 # =====================================================
 class Libro:
-    def __init__(self, titulo, autor, genero, paginas, leido=False):
+    def __init__(self, titulo, autor, genero, isbn, stock):
         self.titulo = titulo.strip()
         self.autor = autor.strip()
         self.genero = genero.strip().lower()
-        self.paginas = paginas
-        self.leido = leido
-
-    def __str__(self):
-        estado = "leído" if self.leido else "no leído"
-        return f"{self.titulo} de {self.autor} ({self.genero}) - {self.paginas} págs., {estado}"
-
-    def alternar_estado(self):
-        self.leido = not self.leido
-
-class Libro_user:
-    def __init__(self, ISBN, titulo, autor, genero, paginas, stock, leido=False):
-        self.idLib = ISBN.strip()
-        self.titulo = titulo.strip()
-        self.autor = autor.strip()
-        self.genero = genero.strip().lower()
-        self.paginas = paginas
+        self.isbn = isbn
         self.stock = stock
-        self.leido = leido
 
     def __str__(self):
-        estado = "leído" if self.leido else "no leído"
-        return f"{self.titulo} de {self.autor} ({self.genero}) - {self.paginas} págs., {estado} (ID: {self.id_libro}, Stock: {self.stock})"
+        return f"{self.titulo} de {self.autor} ({self.genero}) - ID: {self.isbn}, disponibles: {self.stock}"
 
-
-    def alternar_estado(self):
-        self.leido = not self.leido
-  
     def hay_stock(self):
         return self.stock > 0
 
-    def reservar(self):
-        if self.hay_stock():
-            self.stock -= 1
-            return True
-        return False
+
+# from usuario import Usuario  # Asegúrate de importar tu clase Usuario
+
+# class Usuarios:
 
 
-class Usuarios:
-    def __init__(self, lista_de_users=None):
-
-            if lista_de_users is None:
-                self.users = []
-            else:
-                self.users = lista_de_users
-            # self.ui = m.Utiles() #Antiguo utiles
-
+#CLASE MODIFICADA EN 07/11/2025
+       
 class Usuario:
-    def __init__(self, id_user, nombre, email):
+    def __init__(self, id_user, nombre, email, prestados, cantidad):
         self.idUser = id_user
         self.nombre = nombre.strip()
         self.email = email.strip()
+        self.libros_en_prestamo = prestados
+        self.cant = cantidad
 
     def __str__(self):
-        return f"{self.idUser} de {self.nombre} ({self.email})"
+        return f"{self.idUser} de {self.nombre} ({self.email}) {self.libros_en_prestamo} {self.cant}"
 
+    #funcion que agrega el prestamo al usuario
+    def agregar_prestamo(self, titulo):
+        if len(self.libros_en_prestamo) >= 3:
+            return False
+        self.libros_en_prestamo.append(titulo)
+        self.cant += 1
+        return True
+
+    # def reservar(self):
+    #     if self.hay_stock():
+    #         self.stock -= 1
+    #         return True
+    #     return False
+import json
+import os
+
+
+
+class Usuarios:
+    #Por alguna razon alguna cosa la he sacado del chat
+
+    def __init__(self, archivo="usuarios.json"):
+        self.archivo = archivo
+        self.users = []
+        self.ui = Utiles()
+        self.biblioteca = Biblioteca()
+        self.cargar_usuarios()  # 🔹 Carga los usuarios existentes al iniciar
+
+    def agregar_user(self, user_obj):
+        self.users.append(user_obj)
+
+    def en_usuarios(self, nombre):
+        nombre = nombre.strip().lower()
+        for i, u in enumerate(self.users):
+            if u.nombre.lower() == nombre:
+                return i
+        return -1
+
+
+    def guardar_usuarios(self):
+        data = []
+        for u in self.users:
+            user_dict = {
+                "id_user": u.idUser,
+                "nombre": u.nombre,
+                "email": u.email,
+                "libros_en_prestamo": u.libros_en_prestamo,
+                "cantidad_prestados": u.cant
+            }
+            data.append(user_dict)
+
+        try:
+            # Crea la carpeta si no existe
+            carpeta = os.path.dirname(self.archivo)
+            if carpeta and not os.path.exists(carpeta):
+                os.makedirs(carpeta)
+
+            with open(self.archivo, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+
+            print(f"✅ Archivo '{self.archivo}' actualizado correctamente.")
+
+        except Exception as e:
+            print(f"⚠️ Error al guardar los usuarios: {e}")
+
+    def cargar_usuarios(self):
+        if not os.path.exists(self.archivo):
+            self.users = []
+            return
+
+        try:
+            with open(self.archivo, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            self.users = [
+                Usuario(
+                    id_user=u["id_user"],
+                    nombre=u["nombre"],
+                    email=u["email"],
+                    prestados=u.get("libros_en_prestamo", []),
+                    cantidad=u.get("cantidad_prestados", 0)
+                ) for u in data
+            ]
+
+            print(f"📂 {len(self.users)} usuarios cargados desde '{self.archivo}'.")
+
+        except Exception as e:
+            print(f"⚠️ Error al cargar los usuarios: {e}")
+            self.users = []
+
+    def modificar_usuario(self, indice):
+        user = self.users[indice]
+        cant_m = 0
+        modificado = False
+        self.ui.limpiar_pantalla()
     
-    # # Añadir un usuario
-    # def agregar_user(self, user):
-    #     if self.en_usuarios(user['nombre']) == -1:
-    #         self.libros.append(user)
-    #         print(f'Libro "{user["nombre"]}" agregado a usuarios.')
-    #     else:
-    #         print(f'Error: el usuario "{user["nombre"]}" ya existe en usuarios.')
+        # nombre_nuevo = input(f'\nIntroduzca el nuevo nombre de {user.nombre}: ').strip()
+        # email_nuevo = input(f'\nIntroduzca el nuevo email de {user.email}: ').strip()
+        # id_nuevo = self.ui.pedir_entero('Introduzca el nuevo id: ', 1, None)
+
+        nombre_nuevo = input(f'\nIntroduzca el nuevo nombre de {user.nombre}: ').strip()
+        if nombre_nuevo:
+            cant_m += 1
+        else:
+            self.ui.error('no se puede asignar una cadena vacía.')
+
+        email_nuevo = input(f'\nIntroduzca el nuevo email  {user.email}: ').strip()
+        if email_nuevo:
+            cant_m += 1
+        else:
+            self.ui.error('no se puede asignar una cadena vacía.')
+
+        id_nuevo = self.ui.pedir_entero('Introduzca el nuevo id: ', 1, None)
+        if id_nuevo:
+            cant_m += 1
+        else:
+            self.ui.error('no se puede asignar una cadena vacía.')
 
 
-    # def en_usuarios ( self, nombre ):
-    #     # el título es una cadena y la lista_de_libros es una lista de diccionarios con clave 'título' que habrá que recorrer.
-    #     # la función devuelve -1 si el libro no está en la lista de libros o el índice con su posición el la lista si está presente.
-    #     pos = -1
-    #     if not self.libros:
-    #         return pos
+        if cant_m == 3:
+            # Modificar los datos
+            user.nombre = nombre_nuevo
+            user.email = email_nuevo
+            user.idUser = id_nuevo
 
-    #     i = 0
-    #     for us in self.libros:
-    #         if ( us['nombre'].strip().lower() == nombre ) :
-    #             pos = i
-    #             break
-    #         else:
-    #             i += 1
-    #     return pos
+            # Guardar la lista actualizada
+            self.guardar_usuarios()
+
+            print(f"✅ Usuario '{user.nombre}' modificado correctamente.")
+            return True
+        else:
+            self.ui.error('Alguno de los datos no se introdujo y no se modifica el usuario')
+            
+            
+    def hacer_prestamo(self, indice):
+        usuario = self.users[indice]
+
+        if len(usuario.libros_en_prestamo) >= 3:
+            self.ui.error('El usuario ya tiene 3 libros en préstamo.')
+            return
+
+        titulo = input('\nIntroduzca el título de la obra a prestar: ').strip().lower()
+        if not titulo:
+            self.ui.error('El título del libro no puede ser una cadena vacía.')
+            return
+
+        ind = self.biblioteca.en_biblioteca(titulo)
+        if ind < 0:
+            self.ui.error('El libro no se encuentra en la biblioteca.')
+            return
+
+        libro = self.biblioteca.libros[ind]
+        if libro['stock'] < 1:
+            self.ui.error('No quedan ejemplares disponibles.')
+            return
+
+        # ✅ Hacer el préstamo
+        libro['stock'] -= 1
+        usuario.libros_en_prestamo.append(libro['título'])
+        usuario.cant += 1
+
+        # ✅ Guardar los usuarios y libros actualizados
+        self.guardar_usuarios()
+        self.biblioteca.guardar_libros()
+
+        print(f"✅ El libro '{libro['título']}' ha sido prestado a {usuario.nombre}.")
+ 
+    def hacer_devolucion(self, indice):
+        usuario = self.users[indice]
+
+        if not usuario.libros_en_prestamo:
+            self.ui.error('El usuario no tiene libros en préstamo.')
+            return
+
+        print(f"\nLibros en préstamo de {usuario.nombre}:")
+        for i, titulo in enumerate(usuario.libros_en_prestamo, start=1):
+            print(f"{i}. {titulo}")
+
+        titulo = input('\nIntroduzca el título del libro que desea devolver: ').strip().lower()
+        if not titulo:
+            self.ui.error('El título no puede ser una cadena vacía.')
+            return
+
+        titulos_norm = [t.lower() for t in usuario.libros_en_prestamo]
+        if titulo not in titulos_norm:
+            self.ui.error('Ese libro no figura entre los préstamos del usuario.')
+            return
+
+        ind_libro = self.biblioteca.en_biblioteca(titulo)
+        if ind_libro < 0:
+            self.ui.error('El libro no se encuentra en la biblioteca.')
+            return
+
+        # Actualizar datos
+        libro = self.biblioteca.libros[ind_libro]
+        libro['stock'] += 1
+        index_en_usuario = titulos_norm.index(titulo)
+        usuario.libros_en_prestamo.pop(index_en_usuario)
+        usuario.cant -= 1
+
+        # 🔹 Guardar cambios en archivos
+        self.biblioteca.guardar_libros()
+        self.usuarios.guardar_usuarios()
+
+        print(f"✅ El libro '{libro['título']}' ha sido devuelto por {usuario.nombre}.")
+
+
+
+
+
 
 
 # 
@@ -109,17 +340,47 @@ class Usuario:
 #                       ([str generos])               buscar_generos        ( lista_diccionarios biblioteca )
 #                       (None)                        menu_buscar_libro     ( None )
 #                       (None)                        buscar_libro          ( lista_diccionarios biblioteca )
-#                       (None)                        mostrar_estadisticas  ( lista_diccionarios biblioteca )
+#                       (int posición)                isbn_en_biblioteca    ( lista_diccionarios biblioteca )
+
+# class Biblioteca:
+    # def __init__(self, libros):
+    #     self.libros = libros  # lista de diccionarios
+    #     self.archivo = 'libros.json'
 
 
 class Biblioteca:
-    def __init__(self, lista_de_libros=None):
 
-            if lista_de_libros is None:
-                self.libros = []
-            else:
-                self.libros = lista_de_libros
-            self.ui = m.Utiles() #Antiguo utiles
+    def __init__(self, lista_de_libros=None, archivo="libros.json"):
+        self.archivo = archivo
+        if not lista_de_libros:
+            self.libros = self._cargar_desde_archivo()
+        else:
+            self.libros = lista_de_libros
+        self.ui = Utiles() #Antiguo utiles
+
+    def guardar_libros(self):
+        try:
+            with open(self.archivo, 'w', encoding='utf-8') as f:
+                json.dump(self.libros, f, ensure_ascii=False, indent=4)
+            print("✅ Biblioteca guardada correctamente.")
+        except Exception as e:
+            print(f"⚠️ Error al guardar la biblioteca: {e}")
+
+    def _cargar_desde_archivo(self):
+        import json, os
+        if os.path.exists(self.archivo):
+            try:
+                with open(self.archivo, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    print(f"📚 Biblioteca cargada ({len(data)} libros).")
+                    return data
+            except Exception as e:
+                print(f"⚠️ Error al cargar biblioteca: {e}")
+                return []
+        else:
+            print(f"ℹ️ No se encontró {self.archivo}, se creará vacío.")
+            return []
+
 
     # Añadir un libro
     def agregar_libro(self, libro):
@@ -129,6 +390,14 @@ class Biblioteca:
         else:
             print(f'Error: el libro "{libro["título"]}" ya existe en la biblioteca.')
 
+    def guardar_libros(self):
+        import json
+        try:
+            with open(self.archivo, "w", encoding="utf-8") as f:  # 🔹 modo 'w', no 'a'
+                json.dump(self.libros, f, indent=2, ensure_ascii=False)
+            print(f"✅ Biblioteca guardada ({len(self.libros)} libros).")
+        except Exception as e:
+            print(f"⚠️ Error al guardar biblioteca: {e}")
 
     def en_biblioteca ( self, titulo ):
         # el título es una cadena y la lista_de_libros es una lista de diccionarios con clave 'título' que habrá que recorrer.
@@ -145,6 +414,21 @@ class Biblioteca:
             else:
                 i += 1
         return pos
+    
+    def isbn_en_biblioteca ( self, isbn ):
+        # el isbn es un entero y la lista_de_libros es una lista de diccionarios con clave 'ISBN' que habrá que recorrer.
+        # la función devuelve -1 si el libro no está en la lista de libros o el índice con su posición el la lista si está presente.
+        pos = -1
+        if self.libros:
+            i = 0
+            for libro in self.libros:
+                if ( libro['ISBN'] == isbn ) :
+                    pos = i
+                    break
+                else:
+                    i += 1
+        return pos
+
 
     def libros_por_autor (self, autor):
 
@@ -178,10 +462,10 @@ class Biblioteca:
 
     def eliminar_libro(self):
 
-        # Función que le pregunta al usuario el título o el autor de una obra dentro de [lista_de_libros]
+        # Función que le pregunta al usuario el título o el autor o el ISBN de una obra dentro de [lista_de_libros]
         # y retorna la posición del libro a buscar dentro de la lista o -1 en caso que no lo encuentre por los parámetros de búsqueda.
         posicion = -1
-        op = self.ui.pedir_entero('\n¿Cómo quiere buscar la obra? 1- por título, 2- por autor. ',1,2)
+        op = self.ui.pedir_entero('\n¿Cómo quiere buscar la obra?\n\n1- Por título\n2- Por autor\n3.- Por ISBN\n',1,3)
 
         match op:
             case 1:
@@ -210,7 +494,9 @@ class Biblioteca:
                             posicion = self.en_biblioteca( titulo_standard)
                         else:
                             self.ui.error('cancelación del borrado.')
-
+            case 3:
+                isbn = self.ui.pedir_entero('Introduzca el ISBN de la obra a eliminar del catálogo: ',1,None)
+                posicion = self.isbn_en_biblioteca(isbn)
             case _:
                 self.ui.error('inesperado borrando libro.')
 
@@ -226,8 +512,8 @@ class Biblioteca:
         1.- Modificar el título.
         2.- Modificar el autor.
         3.- Modificar el género.
-        4.- Modificar el número de páginas.
-        5.- Modificar el estado de lectura.
+        4.- Modificar el número de ISBN.
+        5.- Modificar el stock.
         6.- Salir de la modificación del libro.
                 ''')
 
@@ -269,18 +555,13 @@ class Biblioteca:
                     else:
                         self.ui.error('no se puede asignar una cadena vacía.')
                 case 4:
-                    paginas = self.ui.pedir_entero('\nIntroduzca el número de páginas del libro: ',1,None)
-                    self.libros[indice]['páginas'] = paginas
+                    isbn = self.ui.pedir_entero('\nIntroduzca el código ISBN del libro: ',1,None)
+                    self.libros[indice]['ISBN'] = isbn
                     modificado = True
                 case 5:
-                    if self.libros[indice]['leído']:
-                        print('\nModificando el estado del libro de "leído" a "no leído".' )
-                        self.libros[indice]['leído'] = False
-                        modificado = True
-                    else:
-                        print('\nModificando el estado del libro de "no leído" a "leído".' )
-                        self.libros[indice]['leído'] = True
-                        modificado = True
+                    stock = self.ui.pedir_entero('\nIntroduzca cuántas copias nuevas del libro han llegado: ',1,None)
+                    self.libros[indice]['stock'] += stock
+                    modificado = True
                 case 6:
                     salir = True
 
@@ -309,7 +590,7 @@ class Biblioteca:
         while not salir:
             self.ui.limpiar_pantalla()
             self.ui.menu_buscar_libro()
-            opcion = self.ui.pedir_entero('Escoja opción [1-4]: ',1,4)
+            opcion = self.ui.pedir_entero('Escoja opción [1-5]: ',1,5)
             match opcion:
 
                 case 1:
@@ -319,11 +600,7 @@ class Biblioteca:
                         if pos < 0:
                             self.ui.error('título no encontrado en la biblioteca.')
                         else:
-                            if self.libros[pos]['leído']:
-                                leido = 'leído'
-                            else:
-                                leido = 'no leído'
-                            print(f'\n{self.libros[pos]['título']}, escrito por {self.libros[pos]['autor']}: {leido}.')
+                            print(f'\n{self.libros[pos]['título']}, escrito por {self.libros[pos]['autor']}, ISBN: {self.libros[pos]['ISBN']} stock: {self.libros[pos]['stock']}.')
                     else:
                         self.ui.error('no se puede asignar una cadena vacía.')
                 case 2:
@@ -333,11 +610,7 @@ class Biblioteca:
                         print(f'\nLos libros encontrados en la biblioteca de {autor} son:')
                         print(f'============================================{'='*len(autor)}====\n')
                         for i, libro in enumerate(libros):
-                            if libro['leído']:
-                                leido = 'leído'
-                            else:
-                                leido = 'no leído'
-                            print(f'{i+1} - {libro['título']}, {leido}.')    
+                            print(f'{i+1} - {libro['título']}, ISBN: {libro['ISBN']}, stock: {libro['stock']}.')    
                     else:
                         self.ui.error('no se puede asignar una cadena vacía.')
                 case 3:
@@ -352,43 +625,100 @@ class Biblioteca:
                         print(f'\nLos libros encontrados en la biblioteca del género {genero} son:')
                         print(f'===================================================={'='*len(genero)}====\n')
                         for i, libro in enumerate(libros):
-                            if libro['leído']:
-                                leido = 'leído'
-                            else:
-                                leido = 'no leído'
-                            print(f'{i+1} - {libro['título']} de {libro['autor']}, {leido}.')
+                            print(f'{i+1} - {libro['título']} de {libro['autor']}, ISBN: {libro['ISBN']} disponibles: {libro['stock']}.')
                     else:
                         self.ui.error('no se puede asignar una cadena vacía.')
                 case 4:
+                    isbn = self.ui.pedir_entero('Introduzca el ISBN del libro a buscar: ',1,None)
+                    pos = self.isbn_en_biblioteca(isbn)
+                    if pos < 0:
+                        self.ui.error('ISBN no presente en el catálogo de libros.')
+                    else:
+                        print(f'\n{self.libros[pos]['título']}, escrito por {self.libros[pos]['autor']}, stock: {self.libros[pos]['stock']}.')
+                case 5:
                     salir = True
 
-            if opcion in [1,2,3]:
+            if opcion in [1,2,3,4]:
                 self.ui.esperar_input()
 
 
     def generos_disponibles(self):
         return set(libro.genero for libro in self.libros)
 
-    def estadisticas_biblioteca(self):
+class Utiles:
 
-        # Función que tiene como entrada una biblioteca, esto es, una [lista_de_libros], donde cada libro es un diccionario con
-        # las llaves: título, autor, género, páginas y leído.
-        # Y muestra por pantalla los siguientes datos:
-        # Total de libros en la biblioteca, promedio de páginas y porcentaje de libros leídos/total_de_libros en la biblioteca.
+    @staticmethod
+    def error(cadena):
+        print(f'\nError: {cadena}')
 
-        if self.libros:
-            total_libros = len(self.libros)
-            promedio_paginas = 0
-            leidos = 0
-            for libro in self.libros:
-                promedio_paginas += libro['páginas']
-                if libro['leído']:
-                    leidos += 1
-            promedio_paginas /= total_libros
-            porcentaje = leidos * 100 / total_libros
+    @staticmethod
+    def esperar_input():
+        input('\nPresione la tecla [ENTER]')
 
-            print(f'\nLa biblioteca contiene {total_libros} libros, de los cuales has léido un {porcentaje:.2f}% y el promedio de páginas de todos los libros es de: {round(promedio_paginas)}')
-        else:
-            self.ui.error('no se pueden mostrar estadísticas, no hay biblioteca.')
+    @staticmethod
+    def limpiar_pantalla():
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+    @staticmethod
+    def mostrar_menu_principal():
+        print('''
+Gestor de Biblioteca Personal:
+=============================
+
+1.- Añadir Libro.
+2.- Eliminar Libro.
+3.- Editar/Modificar Libro.
+4.- Buscar Libro.
+5.- Introducir Usuario.
+6.- Modificar Usuario.
+7.- Devolución de Libro.
+8.- Préstamo de Libro.
+9.- Salir del Gestor.
+          ''')   
+    
+    @staticmethod     
+    def menu_buscar_libro ():
+    # Función para mostrar la interfaz de búsqueda de entradas en la biblioteca personal.
+        print('''
+    Búsquedas de libro:
+    ==================
+
+    1.- Por título.
+    2.- Por autor.
+    3.- Por género.
+    4.- Por ISBN.
+    5.- Salir del menú de búsquedas.
+            ''')
+
+
+    @staticmethod
+    def pedir_entero(mensaje, valor_minimo=None, valor_maximo=None):
+        while True:
+            try:
+                valor = int(input(mensaje))
+                if valor_minimo is not None and valor < valor_minimo:
+                    continue
+                if valor_maximo is not None and valor > valor_maximo:
+                    continue
+                return valor
+            except ValueError:
+                print('Introduce un número válido.')
+
+    @staticmethod
+    def validar_datos(titulo, autor, genero, isbn, stock):
+        print('\nConfirme que quiere introducir la siguiente entrada a la Biblioteca personal:')
+        print(f'Título: {titulo}, autor: {autor}, género: {genero}, ISBN: {isbn}, unidades disponibles: {stock}.\n')
+        respuesta = input('Confirme (y/n): ').strip().lower()
+        return respuesta == 'y'
+   
+
+    @staticmethod
+    def validar_datos_user(nombre, email):
+        print('\nConfirme que quiere introducir la siguiente entrada a la Biblioteca personal:')
+        print(f'Nombre: {nombre}, E-mail: {email}.\n')
+        respuesta = input('Confirme (y/n): ').strip().lower()
+        return respuesta == 'y'
+
+
 
 
