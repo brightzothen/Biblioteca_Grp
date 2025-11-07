@@ -1,104 +1,7 @@
 import os 
-import metodo as met
-from pathlib import Path
-
+from metodo import Usuarios, Biblioteca, Usuario, Utiles, GestorArchivo, GArchivo_Usuario
 
 import json
-
-
-class GestorArchivo:
-    
-    def __init__(self, ruta_archivo='libros.json'):
-        self.ruta_archivo = Path(ruta_archivo)
-        self.ui = Utiles()
-        
-    def leer_archivo (self):
-        lista_de_libros = []
-
-        try:
-            with self.ruta_archivo.open('r', encoding='utf-8') as f:
-                lista_de_libros = json.load(f)
-        except FileNotFoundError:
-            self.ui.error('El archivo no existe.')
-        except PermissionError:
-            self.ui.error('No tienes permisos de acceso.')
-        except json.JSONDecodeError:
-            self.ui.error('El archivo contiene datos corruptos.')
-        return lista_de_libros
-
-    def actualizar_archivo(self, lista_de_libros):
-        try:
-            with self.ruta_archivo.open('w', encoding='utf-8') as f:
-                json.dump(lista_de_libros, f, ensure_ascii=False, indent=2)
-        except PermissionError:
-            self.ui.error('No tienes permisos de acceso.')
-
-
-
-class Utiles:
-
-    @staticmethod
-    def error(cadena):
-        print(f'\nError: {cadena}')
-
-    @staticmethod
-    def esperar_input():
-        input('\nPresione la tecla [ENTER]')
-
-    @staticmethod
-    def limpiar_pantalla():
-        os.system('cls' if os.name == 'nt' else 'clear')
-
-    @staticmethod
-    def mostrar_menu_principal():
-        print('''
-Gestor de Biblioteca Personal:
-=============================
-
-1.- Añadir Libro.
-2.- Eliminar Libro.
-3.- Editar/Modificar Libro.
-4.- Buscar Libro.
-5.- Préstamo de Libro.
-6.- Salir del Gestor.
-          ''')   
-    
-    @staticmethod     
-    def menu_buscar_libro ():
-    # Función para mostrar la interfaz de búsqueda de entradas en la biblioteca personal.
-        print('''
-    Búsquedas de libro:
-    ==================
-
-    1.- Por título.
-    2.- Por autor.
-    3.- Por género.
-    4.- Por ISBN.
-    5.- Salir del menú de búsquedas.
-            ''')
-
-
-    @staticmethod
-    def pedir_entero(mensaje, valor_minimo=None, valor_maximo=None):
-        while True:
-            try:
-                valor = int(input(mensaje))
-                if valor_minimo is not None and valor < valor_minimo:
-                    continue
-                if valor_maximo is not None and valor > valor_maximo:
-                    continue
-                return valor
-            except ValueError:
-                print('Introduce un número válido.')
-
-    @staticmethod
-    def validar_datos(titulo, autor, genero, isbn, stock):
-        print('\nConfirme que quiere introducir la siguiente entrada a la Biblioteca personal:')
-        print(f'Título: {titulo}, autor: {autor}, género: {genero}, ISBN: {isbn}, unidades disponibles: {stock}.\n')
-        respuesta = input('Confirme (y/n): ').strip().lower()
-        return respuesta == 'y'
-
-
 
 # =====================================================
 # EJECUCIÓN PRINCIPAL
@@ -110,18 +13,32 @@ Gestor de Biblioteca Personal:
 
 
 class GestorBiblioteca:
+    
     def __init__(self):
-        self.a = GestorArchivo()
-        self.biblioteca = met.Biblioteca(self.a.leer_archivo()) #mecoge la clase biblioteca con la lectura del archivo
+        self.a = GestorArchivo('libros.json')
+        self.biblioteca = Biblioteca(self.a.leer_archivo()) #mecoge la clase biblioteca con la lectura del archivo
         self.ui = Utiles() #Antiguo utiles
+        self.us = GArchivo_Usuario('usuarios.json')
+        self.usuarios = Usuarios("usuarios.json")
         
+        # self.usuario = Usuarios()  # Aquí creas el objeto Usuarios
+        # self.biblioteca = Biblioteca()  # si tienes biblioteca también
+
+        # self.a = GestorArchivo('libros.json')
+        # # self.biblioteca = met.Biblioteca(self.a.leer_archivo()) #mecoge la clase biblioteca con la lectura del archivo
+        # self.ui = Utiles() #Antiguo utiles
+        # self.us = GestorArchivo('usuarios.json')
+        # self.usuario = met.Usuarios(self.us.leer_archivo()) #mecoge la clase usuarios con la lectura del archivo
+
+
+
 
     def menu_principal(self):
         salir = False
         while not salir:
             self.ui.limpiar_pantalla()
             self.ui.mostrar_menu_principal()
-            opcion = self.ui.pedir_entero('Escoja opción [1-6]: ', 1, 6)
+            opcion = self.ui.pedir_entero('Escoja opción [1-9]: ', 1, 9)
 
 
             match opcion:
@@ -133,11 +50,16 @@ class GestorBiblioteca:
                     self.modificar_libro()
                 case 4:
                     self.biblioteca.buscar_libro()
-
                 case 5:
-                    pass
+                    self.agregar_user()
                 case 6:
-                    print('\nGracias por usar el Gestor de Biblioteca Personal. Guardando el archivo. ¡Hasta la próxima!\n')
+                    self.modificar_usuario()
+                case 7:
+                    self.hacer_devolucion()
+                case 8:
+                    self.hacer_prestamo()
+                case 9:
+                    print('\nGracias por usar el Gestor de Biblioteca. Guardando el archivo. ¡Hasta la próxima!\n')
                     self.a.actualizar_archivo(self.biblioteca.libros)
                     salir = True
                 case _:
@@ -145,7 +67,7 @@ class GestorBiblioteca:
                     self.ui.esperar_input()
 
 
-            if opcion in [1, 2, 3, 5]:
+            if opcion in [1, 2, 3, 5, 6, 8]:
                 self.ui.esperar_input()
 
 
@@ -173,6 +95,9 @@ class GestorBiblioteca:
                         'ISBN': isbn,
                         'stock': stock
                     }
+
+
+
 
                     self.biblioteca.agregar_libro(libro)
                     self.a.actualizar_archivo(self.biblioteca.libros)
@@ -210,6 +135,88 @@ class GestorBiblioteca:
                     self.a.actualizar_archivo(self.biblioteca.libros)
                     print('Entrada modificada y actualizada en el archivo.')
         # self.ui.esperar_input()
+
+    def agregar_user(self):
+        
+        nombre = input('\nIntroduzca el nombre del usuario: ').strip().lower()
+        email = input('Introduzca el email  del usuario: ').strip().lower()
+        idn = self.ui.pedir_entero('Introduzca el id del usuario: ',1,None)
+        prestamos = []
+        
+        if not nombre or not email:
+            self.ui.error("Datos de entrada erróneos.")
+            return
+        else:
+            if self.usuarios.en_usuarios ( nombre ) == -1: # comprobamos que el usuario no esté en nuestra lista ya.
+                if self.ui.validar_datos_user(nombre, email): #ideas
+                    print(f'Añadiendo {nombre} a la lista de usuarios.')
+
+                    userd = Usuario(idn, nombre, email, [], 0)
+        
+                    self.usuarios.agregar_user(userd)
+                    self.usuarios.guardar_usuarios()
+
+                else:
+                    print('Entrada descartada.')
+            else:
+                self.ui.error(' el usuario ya está en la biblioteca, no se puede añadir otra instancia nueva.')
+
+    def modificar_usuario(self):
+        nombre = input('\nIntroduzca el nombre del usuario a modificar: ').strip().lower()
+        if not nombre:
+            self.ui.error('el nombre no puede ser una cadena vacía.')
+        else:
+            indice = self.usuarios.en_usuarios(nombre)
+            if indice < 0:
+                self.ui.error('el usuario no se encuentra en la biblioteca.')
+            else:
+                mod = self.usuarios.modificar_usuario(indice)
+                if not mod:
+                    self.ui.error('la entrada del usuario no ha sido modificada.')
+                else:
+                    self.usuarios.guardar_usuarios()  # Guardamos los cambios
+
+                    # self.us.actualizar_archivo(self.usuario.users)
+                    print('Entrada modificada y actualizada en el archivo.')
+        # self.ui.esperar_input()
+
+    def hacer_prestamo(self):
+        # Función que gestiona los préstamos de libros.
+        # Tiene como entrada el Gestor de Biblioteca, que contiene una lista de Libros y una lista de Usuarios.
+        # Por convención hemos decidido que sólo se podrán modificar los datos de un usuario en referencia a sus préstamos mediante "hacer_prestamo" y "hacer_devolucion"
+        # Y como mucho un usuario podrá tener 3 libros prestados.
+
+        nombre = input('\nIntroduzca el nombre del usuario que solicita el préstamo: ').strip().lower()
+        if not nombre:
+            self.ui.error('el nombre no puede ser una cadena vacía.')
+        else:
+            indice = self.usuarios.en_usuarios(nombre.lower())
+            if indice < 0:
+                self.ui.error('el usuario no se encuentra en la biblioteca.')
+            else:
+                mod = self.usuarios.hacer_prestamo(indice)
+                if not mod:
+                    self.ui.error('la entrada del usuario no ha sido modificada.')
+                else:
+                    self.usuarios.guardar_usuarios()  # Guardamos los cambios
+
+    #FUNCION MODIFICADA 07/11/2025
+    def hacer_devolucion(self):
+
+        nombre = input('\nIntroduzca el nombre del usuario que devuelve un libro: ').strip().lower()
+        if not nombre:
+            self.ui.error('El nombre no puede ser una cadena vacía.')
+        else:
+            indice = self.usuarios.en_usuarios(nombre)
+            if indice < 0:
+                self.ui.error('El usuario no se encuentra en la biblioteca.')
+            else:
+                mod = self.usuarios.hacer_devolucion(indice)
+                if not mod:
+                    self.ui.error('la entrada del usuario no ha sido modificada.')
+                else:
+                    self.usuarios.guardar_usuarios()  # Guardamos los cambios
+
 
 if __name__ == "__main__":
     gestor = GestorBiblioteca()

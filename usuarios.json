@@ -1,0 +1,32 @@
+[
+  {
+    "id_user": 6777,
+    "nombre": "car",
+    "email": "khñj",
+    "libros_en_prestamo": [
+      "polaris"
+    ],
+    "cantidad_prestados": 1
+  },
+  {
+    "id_user": 89,
+    "nombre": "uuu",
+    "email": "yuu",
+    "libros_en_prestamo": [],
+    "cantidad_prestados": 0
+  },
+  {
+    "id_user": 566778,
+    "nombre": "pal",
+    "email": "iiii",
+    "libros_en_prestamo": [],
+    "cantidad_prestados": 0
+  },
+  {
+    "id_user": 78,
+    "nombre": "pepe",
+    "email": "poli",
+    "libros_en_prestamo": [],
+    "cantidad_prestados": 0
+  }
+]

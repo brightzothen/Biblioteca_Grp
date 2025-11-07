@@ -1,0 +1,37 @@
+[
+  {
+    "título": "bar",
+    "autor": "pol",
+    "género": "drama",
+    "ISBN": 3,
+    "stock": 3
+  },
+  {
+    "título": "mar",
+    "autor": "mar",
+    "género": "drama",
+    "ISBN": 90,
+    "stock": 3
+  },
+  {
+    "título": "polar",
+    "autor": "pol",
+    "género": "drama",
+    "ISBN": 3,
+    "stock": 3
+  },
+  {
+    "título": "mar",
+    "autor": "mar",
+    "género": "drama",
+    "ISBN": 90,
+    "stock": 3
+  },
+  {
+    "título": "polaris",
+    "autor": "carl",
+    "género": "drama",
+    "ISBN": 90,
+    "stock": 3
+  }
+]
