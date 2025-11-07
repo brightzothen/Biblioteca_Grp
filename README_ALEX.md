@@ -42,6 +42,8 @@ También cambio los archivos de guardado de datos:
 libros.json >> biblioteca.json
 usuarios.json >> usuaris.json
 
+Pusheado el trabajo hecho en la rama "prueba" a GitHub y de GitHub movido a la rama "alex" 
+
 Commits:
 ========
 Algunos commits los comentó Arnau. De nuevo no quise entrar en conflicto sobre el uso de mi ordenador local y dejé que los enviara él.
