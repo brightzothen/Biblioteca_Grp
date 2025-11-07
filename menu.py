@@ -1,16 +1,11 @@
 import os 
-from metodo import Usuarios, Biblioteca, Usuario, Utiles, GestorArchivo, GArchivo_Usuario
+from metodo import Usuarios, Biblioteca, Usuario, Utiles, GestorArchivo, GArchivo_Usuario, validate
 
 import json
 
 # =====================================================
 # EJECUCIÓN PRINCIPAL
 # =====================================================
-
-
-# from libros import Libro, Biblioteca
-# from archivos import Archivo as a
-
 
 class GestorBiblioteca:
     
@@ -20,17 +15,6 @@ class GestorBiblioteca:
         self.ui = Utiles() #Antiguo utiles
         self.us = GArchivo_Usuario('usuarios.json')
         self.usuarios = Usuarios("usuarios.json")
-        
-        # self.usuario = Usuarios()  # Aquí creas el objeto Usuarios
-        # self.biblioteca = Biblioteca()  # si tienes biblioteca también
-
-        # self.a = GestorArchivo('libros.json')
-        # # self.biblioteca = met.Biblioteca(self.a.leer_archivo()) #mecoge la clase biblioteca con la lectura del archivo
-        # self.ui = Utiles() #Antiguo utiles
-        # self.us = GestorArchivo('usuarios.json')
-        # self.usuario = met.Usuarios(self.us.leer_archivo()) #mecoge la clase usuarios con la lectura del archivo
-
-
 
 
     def menu_principal(self):
@@ -96,16 +80,12 @@ class GestorBiblioteca:
                         'stock': stock
                     }
 
-
-
-
                     self.biblioteca.agregar_libro(libro)
                     self.a.actualizar_archivo(self.biblioteca.libros)
                 else:
                     print('Entrada descartada.')
             else:
                 self.ui.error(' el libro ya está en la biblioteca, no se puede añadir otra instancia nueva.')
-        # self.ui.esperar_input()
 
              
    
@@ -117,7 +97,7 @@ class GestorBiblioteca:
             print(f'\nEliminando {self.biblioteca.libros[indice]['título']} de la biblioteca.')
             del(self.biblioteca.libros[indice])
             self.a.actualizar_archivo(self.biblioteca.libros)
-        # self.ui.esperar_input()
+
 
     def modificar_libro(self):
         titulo = input('\nIntroduzca el título de la obra a editar: ').strip().lower()
@@ -134,88 +114,105 @@ class GestorBiblioteca:
                 else:
                     self.a.actualizar_archivo(self.biblioteca.libros)
                     print('Entrada modificada y actualizada en el archivo.')
-        # self.ui.esperar_input()
 
-    def agregar_user(self):
-        
+
+    def agregar_user(self):       
         nombre = input('\nIntroduzca el nombre del usuario: ').strip().lower()
-        email = input('Introduzca el email  del usuario: ').strip().lower()
-        idn = self.ui.pedir_entero('Introduzca el id del usuario: ',1,None)
-        prestamos = []
-        
-        if not nombre or not email:
-            self.ui.error("Datos de entrada erróneos.")
+        if not nombre.isalpha():
+            self.ui.error("Datos de entrada del nombre eróneos.")
             return
         else:
-            if self.usuarios.en_usuarios ( nombre ) == -1: # comprobamos que el usuario no esté en nuestra lista ya.
-                if self.ui.validar_datos_user(nombre, email): #ideas
-                    print(f'Añadiendo {nombre} a la lista de usuarios.')
-
-                    userd = Usuario(idn, nombre, email, [], 0)
-        
-                    self.usuarios.agregar_user(userd)
-                    self.usuarios.guardar_usuarios()
-
-                else:
-                    print('Entrada descartada.')
+            email = input('Introduzca el email  del usuario: ').strip().lower()
+            if not validate.validar_email(email):
+                self.ui.error("Datos de entrada del email eróneos.")
+                return
             else:
-                self.ui.error(' el usuario ya está en la biblioteca, no se puede añadir otra instancia nueva.')
+                idn = self.ui.pedir_entero('Introduzca el id del usuario: ',1,None)
+
+                if self.usuarios.en_usuarios ( nombre ) == -1: # comprobamos que el usuario no esté en nuestra lista ya.
+                    if self.ui.validar_datos_user(nombre, email): #ideas
+                        print(f'Añadiendo {nombre} a la lista de usuarios.')
+
+                        userd = Usuario(idn, nombre, email, [], 0)
+            
+                        self.usuarios.agregar_user(userd)
+                        self.usuarios.guardar_usuarios()
+
+                    else:
+                        print('Entrada descartada.')
+                else:
+                    self.ui.error(' el usuario ya está en la biblioteca, no se puede añadir otra instancia nueva.')
 
     def modificar_usuario(self):
+        cat = True
         nombre = input('\nIntroduzca el nombre del usuario a modificar: ').strip().lower()
-        if not nombre:
-            self.ui.error('el nombre no puede ser una cadena vacía.')
-        else:
-            indice = self.usuarios.en_usuarios(nombre)
-            if indice < 0:
-                self.ui.error('el usuario no se encuentra en la biblioteca.')
-            else:
-                mod = self.usuarios.modificar_usuario(indice)
-                if not mod:
-                    self.ui.error('la entrada del usuario no ha sido modificada.')
-                else:
-                    self.usuarios.guardar_usuarios()  # Guardamos los cambios
 
-                    # self.us.actualizar_archivo(self.usuario.users)
-                    print('Entrada modificada y actualizada en el archivo.')
-        # self.ui.esperar_input()
+        if not nombre.isalpha():
+            self.ui.error("Datos de entrada del nombre eróneos.")
+            cat = False
+            return
+        else:
+            if cat == True:
+                indice = self.usuarios.en_usuarios(nombre)
+                if indice < 0:
+                    self.ui.error('el usuario no se encuentra en la biblioteca.')
+                    return
+                else:
+                    mod = self.usuarios.modificar_usuario(indice)
+                    if not mod:
+                        self.ui.error('la entrada del usuario no ha sido modificada.')
+                        return
+                    else:
+                        self.usuarios.guardar_usuarios()  # Guardamos los cambios
+
+                        # self.us.actualizar_archivo(self.usuario.users)
+                        print('Entrada modificada y actualizada en el archivo.')
+            else:
+                self.ui.error('la entrada del usuario no ha sido modificada.')
 
     def hacer_prestamo(self):
-        # Función que gestiona los préstamos de libros.
-        # Tiene como entrada el Gestor de Biblioteca, que contiene una lista de Libros y una lista de Usuarios.
-        # Por convención hemos decidido que sólo se podrán modificar los datos de un usuario en referencia a sus préstamos mediante "hacer_prestamo" y "hacer_devolucion"
-        # Y como mucho un usuario podrá tener 3 libros prestados.
-
+        cat = True
         nombre = input('\nIntroduzca el nombre del usuario que solicita el préstamo: ').strip().lower()
-        if not nombre:
-            self.ui.error('el nombre no puede ser una cadena vacía.')
+        if not nombre.isalpha():
+            self.ui.error("Datos de entrada del nombre eróneos.")
+            cat = False
+            return
         else:
-            indice = self.usuarios.en_usuarios(nombre.lower())
-            if indice < 0:
-                self.ui.error('el usuario no se encuentra en la biblioteca.')
-            else:
-                mod = self.usuarios.hacer_prestamo(indice)
-                if not mod:
-                    self.ui.error('la entrada del usuario no ha sido modificada.')
+            if cat == True:
+                indice = self.usuarios.en_usuarios(nombre.lower())
+                if indice < 0:
+                    self.ui.error('el usuario no se encuentra en la biblioteca.')
                 else:
-                    self.usuarios.guardar_usuarios()  # Guardamos los cambios
+                    mod = self.usuarios.hacer_prestamo(indice)
+                    if not mod:
+                        self.ui.error('la entrada del usuario no ha sido modificada.')
+                    else:
+                        self.usuarios.guardar_usuarios()  # Guardamos los cambios
+            else:
+                self.ui.error('El prestamo no pudo realizarse.')
 
-    #FUNCION MODIFICADA 07/11/2025
+
     def hacer_devolucion(self):
-
+        cat = True
         nombre = input('\nIntroduzca el nombre del usuario que devuelve un libro: ').strip().lower()
-        if not nombre:
-            self.ui.error('El nombre no puede ser una cadena vacía.')
+        if not nombre.isalpha():
+            self.ui.error("Datos de entrada del nombre eróneos.")
+            cat = False
+            return
         else:
-            indice = self.usuarios.en_usuarios(nombre)
-            if indice < 0:
-                self.ui.error('El usuario no se encuentra en la biblioteca.')
-            else:
-                mod = self.usuarios.hacer_devolucion(indice)
-                if not mod:
-                    self.ui.error('la entrada del usuario no ha sido modificada.')
+            if cat == True:
+                indice = self.usuarios.en_usuarios(nombre.lower())
+                if indice < 0:
+                    self.ui.error('El usuario no se encuentra en la biblioteca.')
                 else:
-                    self.usuarios.guardar_usuarios()  # Guardamos los cambios
+                    mod = self.usuarios.hacer_devolucion(indice)
+                    if not mod:
+                        self.ui.error('la entrada del usuario no ha sido modificada.')
+                    else:
+                        self.usuarios.guardar_usuarios()  # Guardamos los cambios
+            else:
+                self.ui.error('la devolucion no pudo realizarse.')
+
 
 
 if __name__ == "__main__":

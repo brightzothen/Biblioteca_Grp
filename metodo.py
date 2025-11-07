@@ -3,6 +3,7 @@
 
 import os
 import json
+import re
 from pathlib import Path
 
 class GArchivo_Usuario:
@@ -95,13 +96,6 @@ class Libro:
     def hay_stock(self):
         return self.stock > 0
 
-
-# from usuario import Usuario  # Asegúrate de importar tu clase Usuario
-
-# class Usuarios:
-
-
-#CLASE MODIFICADA EN 07/11/2025
        
 class Usuario:
     def __init__(self, id_user, nombre, email, prestados, cantidad):
@@ -122,24 +116,16 @@ class Usuario:
         self.cant += 1
         return True
 
-    # def reservar(self):
-    #     if self.hay_stock():
-    #         self.stock -= 1
-    #         return True
-    #     return False
-# import json
-# import os
-
 
 
 class Usuarios:
-    #Por alguna razon alguna cosa la he sacado del chat
 
     def __init__(self, archivo="usuarios.json"):
         self.archivo = archivo
         self.users = []
         self.ui = Utiles()
         self.biblioteca = Biblioteca()
+        self.val = validate()
         self.cargar_usuarios()  # 🔹 Carga los usuarios existentes al iniciar
 
     def agregar_user(self, user_obj):
@@ -210,18 +196,14 @@ class Usuarios:
         modificado = False
         self.ui.limpiar_pantalla()
     
-        # nombre_nuevo = input(f'\nIntroduzca el nuevo nombre de {user.nombre}: ').strip()
-        # email_nuevo = input(f'\nIntroduzca el nuevo email de {user.email}: ').strip()
-        # id_nuevo = self.ui.pedir_entero('Introduzca el nuevo id: ', 1, None)
-
         nombre_nuevo = input(f'\nIntroduzca el nuevo nombre de {user.nombre}: ').strip()
-        if nombre_nuevo:
+        if nombre_nuevo.isalpha():
             cant_m += 1
         else:
             self.ui.error('no se puede asignar una cadena vacía.')
 
         email_nuevo = input(f'\nIntroduzca el nuevo email  {user.email}: ').strip()
-        if email_nuevo:
+        if validate.validar_email(email_nuevo):
             cant_m += 1
         else:
             self.ui.error('no se puede asignar una cadena vacía.')
@@ -320,7 +302,16 @@ class Usuarios:
 
         print(f"✅ El libro '{libro['título']}' ha sido devuelto por {usuario.nombre}.")
 
+class validate:
+    
+    def validar_email(email):
+        patron = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
+        return re.match(patron, email) is not None
 
+    # # Ejemplo:
+    # emails = ["usuario@dominio.com", "mal@correo", "otro@dominio.co"]
+    # for e in emails:
+    #     print(e, "✅ Válido" if validar_email(e) else "❌ Inválido")
 
 
 

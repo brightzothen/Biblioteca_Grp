@@ -28,5 +28,28 @@
     "email": "poli",
     "libros_en_prestamo": [],
     "cantidad_prestados": 0
+  },
+  {
+    "id_user": 999,
+    "nombre": "999",
+    "email": "999",
+    "libros_en_prestamo": [],
+    "cantidad_prestados": 0
+  },
+  {
+    "id_user": 12,
+    "nombre": "8888",
+    "email": "pol",
+    "libros_en_prestamo": [],
+    "cantidad_prestados": 0
+  },
+  {
+    "id_user": 89,
+    "nombre": "cayusi",
+    "email": "polus@gmail.com",
+    "libros_en_prestamo": [
+      "polaris"
+    ],
+    "cantidad_prestados": 1
   }
 ]
