@@ -229,6 +229,7 @@ class Biblioteca:
     # Función que tiene como parámetros de entrada un nombre de autor 'autor' y una lista de disccionarios con las obras del sistema
     # [lista_de_libros]. Si el autor no es la cadena vacía, devuelve la lista de libros dentro de la biblioteca cuyo autor sea el mismo
     # que el marcado por 'autor'.
+    # Refactorizado de los parámetros de entrada. Sigue siendo una lista de Libro, pero usamos un objeto de la class Biblioteca (self).
 
         if not autor:
             self.ui.error('el nombre del autor no puede ser una cadena vacía.')
@@ -298,7 +299,7 @@ class Biblioteca:
 
 
     def menu_editar_libro (self, titulo):
-        # Función para mostrar la interfaz de edición de entradas en la biblioteca personal.
+        # Función para mostrar la interfaz de edición de entradas en el sistema de la biblioteca
             print(f'''
         Edición del libro: {titulo}
         ==================={'='*len(titulo)}
@@ -312,7 +313,7 @@ class Biblioteca:
                 ''')
 
     def modificar_libro (self, indice ):
-        # Función que tiene como parámetros un índice que marca una posición en la [lista_de_libros]
+        # Función que tiene como parámetros un índice que marca una posición en la [lista_de_libros] >> en este caso en la forma de self (objeto: Biblioteca)
         # Le pide al usuario una serie de datos para modificar dicha entrada den la lista y, si el proceso se lleva a cabo bien,
         # devuelve True y modifica la entrada en la lista, en caso contrario devuelve False.
 
@@ -376,7 +377,7 @@ class Biblioteca:
 
 
     def buscar_libro ( self ):
-        # Función que tiene como parámetros una [lista_de_libros]
+        # Función que tiene como parámetros una [lista_de_libros] >> self == objeto del tipo Biblioteca (que es una lista de objetos tipo Libro)
         # Dependiendo de la entrada del usuario le ofrece una información u otra de la biblioteca [lista_de_libros]
 
         salir = False
