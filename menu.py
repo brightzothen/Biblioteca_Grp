@@ -287,7 +287,13 @@ class GestorBiblioteca:
             if indice < 0:
                 self.ui.error('el usuario no se encuentra en la biblioteca.')
             else:
-                mod = self.usuario.hacer_prestamo(indice)
+                mod = self.usuario.hacer_prestamo(indice,self.biblioteca) # le pasamos un objeto biblioteca
+                if not mod:
+                    self.ui.error('la entrada del usuario no ha sido modificada.')
+                else:
+                    self.us.actualizar_archivo(self.usuario.users)
+                    self.a.actualizar_archivo(self.biblioteca.libros)
+                    print('Entrada modificada y actualizada en el archivo.')
                 
 
 if __name__ == "__main__":

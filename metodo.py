@@ -105,25 +105,28 @@ class Usuarios:
         return modificado
 
 
-    def hacer_prestamo( self, indice, libros ):
+    def hacer_prestamo( self, indice, biblioteca ):
+
+        modificado = False
 
         if ( len(self.users[indice]['libros_en_prestamo']) ) > 2:
-                    self.ui.error('el usuario ya tiene 3 libros en préstamo, no puede tener más.')
+            self.ui.error('el usuario ya tiene 3 libros en préstamo, no puede tener más.')
         else:
-                    titulo = input('\nIntroduzca el título de la obra a editar: ').strip().lower()
-                    if not titulo:
-                        self.ui.error('el título del libro no puede ser una cadena vacía.')
+            titulo = input('\nIntroduzca el título de la obra a prestar: ').strip().lower()
+            if not titulo:
+                self.ui.error('el título del libro no puede ser una cadena vacía.')
+            else:
+                ind = biblioteca.en_biblioteca(titulo)
+                if ind < 0:
+                    self.ui.error('el libro no se encuentra en la biblioteca.')
+                else:
+                    if ( biblioteca.libros[ind]['stock'] ) < 1:
+                        self.ui.error('no quedan ejemplares del libro disponibles.')
                     else:
-                        ind = self.biblioteca.en_biblioteca( titulo)
-                        if ind < 0:
-                            self.ui.error('el libro no se encuentra en la biblioteca.')
-                        else:
-                            if ( self.biblioteca.libros[ind]['stock'] ) < 1:
-                                self.ui.error('no quedan ejemplares del libro disponibles.')
-                            else:
-                                self.biblioteca.libros[ind]['stock'] -= 1  # restamos un ejemplar del stock de la biblioteca.
-                                self.usuario.users[indice].libros_en_prestamo.append(self.biblioteca.libros[ind]['título'])
- 
+                        biblioteca.libros[ind]['stock'] -= 1  # restamos un ejemplar del stock de la biblioteca.
+                        self.users[indice]['libros_en_prestamo'].append(biblioteca.libros[ind]['título'])
+                        modificado = True
+        return modificado
 
 
 
