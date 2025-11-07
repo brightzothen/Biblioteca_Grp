@@ -42,6 +42,11 @@ También cambio los archivos de guardado de datos:
 libros.json >> biblioteca.json
 usuarios.json >> usuaris.json
 
+Commits:
+========
+Algunos commits los comentó Arnau. De nuevo no quise entrar en conflicto sobre el uso de mi ordenador local y dejé que los enviara él.
+Estoy en contra de enviar commits comentados como "retocar" o "retocar2" o "grabar" pero no vengo a discutir ni a pelearme al centro.
+
 Uso de la IA generativa:
 ========================
 
