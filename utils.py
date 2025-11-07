@@ -2,7 +2,7 @@
 
 
 import os
-import menu as m
+import biblioteca as m
 # =====================================================
 # CLASE LIBRO
 # =====================================================
@@ -106,6 +106,10 @@ class Usuarios:
 
 
     def hacer_prestamo( self, indice, biblioteca ):
+        # Función que ejecuta el proceso de hacer un préstamo por parte de un usuario y retira un ejemplar de la biblioteca.
+        # Los parámetros son un objeto de tipo Usuarios (self), el índice que marca el usuario que quiere retirar el libro 
+        # y un objeto del tipo Biblioteca que le pasamos desde el objeto de tipo GestorBiblioteca de menu.py.
+        # Devuelve True si puede llevarse a cabo el préstamo y modifica los objetos self y biblioteca, devuelve False en caso contrario.
 
         modificado = False
 
@@ -128,7 +132,33 @@ class Usuarios:
                         modificado = True
         return modificado
 
+    def hacer_devolucion( self, indice, biblioteca ):
+        # Función que ejecuta el proceso de hacer una devolución por parte de un usuario y añade un ejemplar en la biblioteca.
+        # Los parámetros son un objeto de tipo Usuarios (self), el índice que marca el usuario que quiere retirar el libro 
+        # y un objeto del tipo Biblioteca que le pasamos desde el objeto de tipo GestorBiblioteca de menu.py.
+        # Devuelve True si puede llevarse a cabo el préstamo y modifica los objetos self y biblioteca, devuelve False en caso contrario.
 
+        modificado = False
+
+        if not self.users[indice]['libros_en_prestamo']:
+            self.ui.error('el usuario no tiene libros en préstamo, no puede devolver nada.')
+        else:
+            print(f'\nLibros en préstamo de: {self.users[indice]['nombre']}')
+            print(f'======================={'='*len(self.users[indice]['nombre'])}\n')
+            for i, libro in enumerate(self.users[indice]['libros_en_prestamo']):
+                print(f'{i+1} - {libro}')
+            print('\n')
+            libro_a_retornar = self.ui.pedir_entero('Introduzca el ejemplar a devolver: ',1,len(self.users[indice]['libros_en_prestamo']))
+            titulo = self.users[indice]['libros_en_prestamo'][libro_a_retornar-1].strip().lower()
+            ind = biblioteca.en_biblioteca(titulo)
+            if ind < 0:
+                self.ui.error('el libro no se encuentra en la biblioteca.')
+            else:
+                biblioteca.libros[ind]['stock'] += 1 # añadimos el ejemplar devuelto al stock de la biblioteca.
+                del self.users[indice]['libros_en_prestamo'][libro_a_retornar-1] # borramos el libro de la lista de préstamos del usuario.
+                modificado = True
+    
+        return modificado
 
 
 

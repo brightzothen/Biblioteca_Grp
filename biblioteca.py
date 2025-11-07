@@ -1,5 +1,5 @@
 import os 
-import metodo as met
+import utils as met
 from pathlib import Path
 
 
@@ -27,10 +27,10 @@ class GestorArchivo:
             self.ui.error('El archivo contiene datos corruptos.')
         return lista_de_libros
 
-    def actualizar_archivo(self, lista_de_libros):
+    def actualizar_archivo(self, lista):
         try:
             with self.ruta_archivo.open('w', encoding='utf-8') as f:
-                json.dump(lista_de_libros, f, ensure_ascii=False, indent=2)
+                json.dump(lista, f, ensure_ascii=False, indent=2)
         except PermissionError:
             self.ui.error('No tienes permisos de acceso.')
 
@@ -123,10 +123,10 @@ Gestor de Biblioteca Personal:
 
 class GestorBiblioteca:
     def __init__(self):
-        self.a = GestorArchivo('libros.json')
+        self.a = GestorArchivo('biblioteca.json')
         self.biblioteca = met.Biblioteca(self.a.leer_archivo()) #mecoge la clase biblioteca con la lectura del archivo
         self.ui = Utiles() #Antiguo utiles
-        self.us = GestorArchivo('usuarios.json')
+        self.us = GestorArchivo('usuaris.json')
         self.usuario = met.Usuarios(self.us.leer_archivo()) #mecoge la clase usuarios con la lectura del archivo
         
 
@@ -152,7 +152,7 @@ class GestorBiblioteca:
                 case 6:
                     self.modificar_usuario()
                 case 7:
-                    pass
+                    self.hacer_devolucion()
                 case 8:
                     self.hacer_prestamo()
                 case 9:
@@ -164,7 +164,7 @@ class GestorBiblioteca:
                     self.ui.esperar_input()
 
 
-            if opcion in [1, 2, 3, 5, 6, 8]:
+            if opcion in [1, 2, 3, 5, 6, 7, 8]:
                 self.ui.esperar_input()
 
 
@@ -285,7 +285,7 @@ class GestorBiblioteca:
         else:
             indice = self.usuario.en_usuarios(nombre)
             if indice < 0:
-                self.ui.error('el usuario no se encuentra en la biblioteca.')
+                self.ui.error('el usuario no se encuentra en el sistema.')
             else:
                 mod = self.usuario.hacer_prestamo(indice,self.biblioteca) # le pasamos un objeto biblioteca
                 if not mod:
@@ -293,8 +293,29 @@ class GestorBiblioteca:
                 else:
                     self.us.actualizar_archivo(self.usuario.users)
                     self.a.actualizar_archivo(self.biblioteca.libros)
-                    print('Entrada modificada y actualizada en el archivo.')
-                
+                    print('Entrada modificada y actualizada en los archivos.')
+
+    def hacer_devolucion(self):
+        # Función que gestiona los préstamos de libros.
+        # Tiene como entrada el Gestor de Biblioteca, que contiene una lista de Libros y una lista de Usuarios.
+        # Por convención hemos decidido que sólo se podrán modificar los datos de un usuario en referencia a sus préstamos mediante "hacer_prestamo" y "hacer_devolucion"
+        # Y como mucho un usuario podrá tener 3 libros prestados.
+
+        nombre = input('\nIntroduzca el nombre del usuario que viene a devolver un libro: ').strip().lower()
+        if not nombre:
+            self.ui.error('el nombre no puede ser una cadena vacía.')
+        else:
+            indice = self.usuario.en_usuarios(nombre)
+            if indice < 0:
+                self.ui.error('el usuario no se encuentra en el sistema.')
+            else:
+                mod = self.usuario.hacer_devolucion(indice,self.biblioteca) # le pasamos un objeto biblioteca
+                if not mod:
+                    self.ui.error('la devolución no se ha podido completar.')
+                else:
+                    self.us.actualizar_archivo(self.usuario.users)
+                    self.a.actualizar_archivo(self.biblioteca.libros)
+                    print('Entrada modificada y actualizada en los archivos.')           
 
 if __name__ == "__main__":
     gestor = GestorBiblioteca()
