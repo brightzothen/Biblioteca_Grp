@@ -5,6 +5,10 @@ from pathlib import Path
 
 import json
 
+# Clase que gestionará el trabajo con los archivos.
+# Contiene 3 métodos: uno de inicialización, uno usado para leer archivos y volcar los datos en una lista y otro para sobrescribir en un archivo, 
+# volcando los datos desde la memoria al archivo.
+# Personalmente (Álex) creo que no era necesario hacer una class y era mejor tenerlo en un módulo separado, pero la conversión a objetos la hizo Arnau.
 
 class GestorArchivo:
     
@@ -34,7 +38,8 @@ class GestorArchivo:
         except PermissionError:
             self.ui.error('No tienes permisos de acceso.')
 
-
+# class que contiene los métodos estáticos útiles para la interficie de usuario. Antiguamente tenía (Alex) estas funciones en un módulo específico y sin clase.
+# Cuando Arnau reutilizó mi código base y le añadió las class, el chat gpt creó esta clase.
 
 class Utiles:
 
@@ -296,10 +301,10 @@ class GestorBiblioteca:
                     print('Entrada modificada y actualizada en los archivos.')
 
     def hacer_devolucion(self):
-        # Función que gestiona los préstamos de libros.
+        # Función que gestiona las devoluciones de libros.
         # Tiene como entrada el Gestor de Biblioteca, que contiene una lista de Libros y una lista de Usuarios.
         # Por convención hemos decidido que sólo se podrán modificar los datos de un usuario en referencia a sus préstamos mediante "hacer_prestamo" y "hacer_devolucion"
-        # Y como mucho un usuario podrá tener 3 libros prestados.
+        # Y como mucho un usuario podrá tener 3 libros prestados, desde el método modificar_usuario no se puede cambiar este campo del usuario.
 
         nombre = input('\nIntroduzca el nombre del usuario que viene a devolver un libro: ').strip().lower()
         if not nombre:
