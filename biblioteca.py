@@ -303,7 +303,7 @@ class GestorBiblioteca:
     def hacer_devolucion(self):
         # Función que gestiona las devoluciones de libros.
         # Tiene como entrada el Gestor de Biblioteca, que contiene una lista de Libros y una lista de Usuarios.
-        # Por convención hemos decidido que sólo se podrán modificar los datos de un usuario en referencia a sus préstamos mediante "hacer_prestamo" y "hacer_devolucion"
+        # Por convención hemos decidido que sólo se podrán modificar los datos de un usuario en referencia a sus devoluciones mediante "hacer_prestamo" y "hacer_devolucion"
         # Y como mucho un usuario podrá tener 3 libros prestados, desde el método modificar_usuario no se puede cambiar este campo del usuario.
 
         nombre = input('\nIntroduzca el nombre del usuario que viene a devolver un libro: ').strip().lower()
