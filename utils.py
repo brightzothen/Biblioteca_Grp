@@ -2,7 +2,7 @@
 
 
 import os
-import menu as m
+import biblioteca as m
 # =====================================================
 # CLASE LIBRO
 # =====================================================
@@ -17,8 +17,145 @@ class Libro:
     def __str__(self):
         return f"{self.titulo} de {self.autor} ({self.genero}) - ID: {self.isbn}, disponibles: {self.stock}"
 
-    # def alternar_estado(self):
-        # self.leido = not self.leido
+
+# Clase usuario. Atributos:
+            # entero : id_user
+            # cadena : nombre
+            # cadena : email
+            # lista (cadenas) : contiene los títulos en préstamo de dicho usuario.
+class Usuario:
+    def __init__(self, id_user, nombre, email):
+        self.idUser = id_user
+        self.nombre = nombre.strip()
+        self.email = email.strip()
+        self.libros_en_prestamo = []
+
+    def __str__(self):
+        return f"{self.idUser} de {self.nombre} ({self.email})"
+
+# Clase Usuarios creada por Arnau. Personalmente (Alex) habría usado una lista y no habría creado una clase para este objeto, ya que
+# simplemente se trata de una lista (usuario)
+
+class Usuarios:
+    def __init__(self, lista_de_users=None):
+        
+            if lista_de_users is None:
+                self.users = []
+            else:
+                self.users = lista_de_users
+            self.ui = m.Utiles() #Antiguo utiles
+
+   # # Añadir un usuario
+    def agregar_user(self, user):
+        if self.en_usuarios(user['nombre']) == -1:
+            self.users.append(user)
+            print(f'Usuario "{user["nombre"]}" agregado a usuarios.')
+        else:
+            print(f'Error: el usuario "{user["nombre"]}" ya existe en usuarios.')
+
+    def en_usuarios ( self, nombre ):
+        # el título es una cadena y la lista_de_libros es una lista de diccionarios con clave 'título' que habrá que recorrer.
+        # la función devuelve -1 si el libro no está en la lista de libros o el índice con su posición el la lista si está presente.
+        pos = -1
+        if not self.users:
+            return pos
+
+        i = 0
+        for us in self.users:
+            if ( us['nombre'].strip().lower() == nombre ) :
+                pos = i
+                break
+            else:
+                i += 1
+        return pos
+
+    def modificar_usuario (self, indice):
+        # Función que tiene como parámetros un índice que marca una posición en la [lista_de_usuarios]
+        # Le pide al usuario una serie de datos para modificar dicha entrada den la lista y, si el proceso se lleva a cabo bien,
+        # devuelve True y modifica la entrada en la lista, en caso contrario devuelve False.
+
+        modificado = False        
+
+        self.ui.limpiar_pantalla()
+
+        nombre_nuevo = input('\nIntroduzca el nuevo nombre: ').strip()
+        if nombre_nuevo:
+            self.users[indice]['nombre'] = nombre_nuevo
+            modificado = True
+        else:
+            self.ui.error('no se puede asignar una cadena vacía.')
+            return modificado
+            
+        email_nuevo = input('\nIntroduzca el nuevo email: ').strip()
+        if email_nuevo:
+            self.users[indice]['email'] = email_nuevo
+            modificado = True
+        else:
+            self.ui.error('no se puede asignar una cadena vacía.')
+            return modificado
+
+        id_nuevo = self.ui.pedir_entero('Introduzca el nuevo id: ', 1, None)
+        self.users[indice]['id_user'] = id_nuevo
+
+        return modificado
+
+
+    def hacer_prestamo( self, indice, biblioteca ):
+        # Función que ejecuta el proceso de hacer un préstamo por parte de un usuario y retira un ejemplar de la biblioteca.
+        # Los parámetros son un objeto de tipo Usuarios (self), el índice que marca el usuario que quiere retirar el libro 
+        # y un objeto del tipo Biblioteca que le pasamos desde el objeto de tipo GestorBiblioteca de menu.py >> ahora denominado biblioteca.py
+        # Devuelve True si puede llevarse a cabo el préstamo y modifica los objetos self y biblioteca, devuelve False en caso contrario.
+
+        modificado = False
+
+        if ( len(self.users[indice]['libros_en_prestamo']) ) > 2:
+            self.ui.error('el usuario ya tiene 3 libros en préstamo, no puede tener más.')
+        else:
+            titulo = input('\nIntroduzca el título de la obra a prestar: ').strip().lower()
+            if not titulo:
+                self.ui.error('el título del libro no puede ser una cadena vacía.')
+            else:
+                ind = biblioteca.en_biblioteca(titulo)
+                if ind < 0:
+                    self.ui.error('el libro no se encuentra en la biblioteca.')
+                else:
+                    if ( biblioteca.libros[ind]['stock'] ) < 1:
+                        self.ui.error('no quedan ejemplares del libro disponibles.')
+                    else:
+                        biblioteca.libros[ind]['stock'] -= 1  # restamos un ejemplar del stock de la biblioteca.
+                        self.users[indice]['libros_en_prestamo'].append(biblioteca.libros[ind]['título'])
+                        modificado = True
+        return modificado
+
+    def hacer_devolucion( self, indice, biblioteca ):
+        # Función que ejecuta el proceso de hacer una devolución por parte de un usuario y añade un ejemplar en la biblioteca.
+        # Los parámetros son un objeto de tipo Usuarios (self), el índice que marca el usuario que quiere retirar el libro 
+        # y un objeto del tipo Biblioteca que le pasamos desde el objeto de tipo GestorBiblioteca de menu.py.
+        # Devuelve True si puede llevarse a cabo el préstamo y modifica los objetos self y biblioteca, devuelve False en caso contrario.
+
+        modificado = False
+
+        if not self.users[indice]['libros_en_prestamo']:
+            self.ui.error('el usuario no tiene libros en préstamo, no puede devolver nada.')
+        else:
+            print(f'\nLibros en préstamo de: {self.users[indice]['nombre']}')
+            print(f'======================={'='*len(self.users[indice]['nombre'])}\n')
+            for i, libro in enumerate(self.users[indice]['libros_en_prestamo']):
+                print(f'{i+1} - {libro}')
+            print('\n')
+            libro_a_retornar = self.ui.pedir_entero('Introduzca el ejemplar a devolver: ',1,len(self.users[indice]['libros_en_prestamo']))
+            titulo = self.users[indice]['libros_en_prestamo'][libro_a_retornar-1].strip().lower()
+            ind = biblioteca.en_biblioteca(titulo)
+            if ind < 0:
+                self.ui.error('el libro no se encuentra en la biblioteca.')
+            else:
+                biblioteca.libros[ind]['stock'] += 1 # añadimos el ejemplar devuelto al stock de la biblioteca.
+                del self.users[indice]['libros_en_prestamo'][libro_a_retornar-1] # borramos el libro de la lista de préstamos del usuario.
+                modificado = True
+    
+        return modificado
+
+
 
 # 
 #                                           Lista de funciones programadas en este módulo:
@@ -26,7 +163,8 @@ class Libro:
 # 
 #                           Return                        Call                               Parameters
 # 
-#                       (int posicion)                en_biblioteca         ( str titulo, lista_diccionarios biblioteca )
+#                       (int posicion)                en_biblioteca         ( self, str titulo ) *método de la clase Biblioteca
+#                       (None)                        agregar_libro         ( self, Libro libro ) *método de la clase Biblioteca
 #                       ([libros diccionarios])       libros_por_autor      ( str autor, lista_diccionarios biblioteca )
 #                       ([libros diccionarios])       libros_por_genero     ( str genero, lista_diccionarios biblioteca )
 #                       (int posicion)                eliminar_libro        ( lista_diccionarios biblioteca )
@@ -38,6 +176,7 @@ class Libro:
 #                       (int posición)                isbn_en_biblioteca    ( lista_diccionarios biblioteca )
 
 
+# Clase creada por Arnau. De nuevo, personalmente (Alex) habría usado una lista ya que se trata de una colección del tipo de objeto (Libro).
 class Biblioteca:
     def __init__(self, lista_de_libros=None):
 
@@ -47,7 +186,7 @@ class Biblioteca:
                 self.libros = lista_de_libros
             self.ui = m.Utiles() #Antiguo utiles
 
-    # Añadir un libro
+    # Añadir un libro (del tipo Libro) a un objeto del tipo Biblioteca.
     def agregar_libro(self, libro):
         if self.en_biblioteca(libro['título']) == -1:
             self.libros.append(libro)
@@ -60,16 +199,14 @@ class Biblioteca:
         # el título es una cadena y la lista_de_libros es una lista de diccionarios con clave 'título' que habrá que recorrer.
         # la función devuelve -1 si el libro no está en la lista de libros o el índice con su posición el la lista si está presente.
         pos = -1
-        if not self.libros:
-            return pos
-
-        i = 0
-        for libro in self.libros:
-            if ( libro['título'].strip().lower() == titulo ) :
-                pos = i
-                break
-            else:
-                i += 1
+        if self.libros:
+            i = 0
+            for libro in self.libros:
+                if ( libro['título'].strip().lower() == titulo ) :
+                    pos = i
+                    break
+                else:
+                    i += 1
         return pos
     
     def isbn_en_biblioteca ( self, isbn ):
@@ -92,6 +229,7 @@ class Biblioteca:
     # Función que tiene como parámetros de entrada un nombre de autor 'autor' y una lista de disccionarios con las obras del sistema
     # [lista_de_libros]. Si el autor no es la cadena vacía, devuelve la lista de libros dentro de la biblioteca cuyo autor sea el mismo
     # que el marcado por 'autor'.
+    # Refactorizado de los parámetros de entrada. Sigue siendo una lista de Libro, pero usamos un objeto de la class Biblioteca (self).
 
         if not autor:
             self.ui.error('el nombre del autor no puede ser una cadena vacía.')
@@ -161,7 +299,7 @@ class Biblioteca:
 
 
     def menu_editar_libro (self, titulo):
-        # Función para mostrar la interfaz de edición de entradas en la biblioteca personal.
+        # Función para mostrar la interfaz de edición de entradas en el sistema de la biblioteca
             print(f'''
         Edición del libro: {titulo}
         ==================={'='*len(titulo)}
@@ -175,7 +313,7 @@ class Biblioteca:
                 ''')
 
     def modificar_libro (self, indice ):
-        # Función que tiene como parámetros un índice que marca una posición en la [lista_de_libros]
+        # Función que tiene como parámetros un índice que marca una posición en la [lista_de_libros] >> en este caso en la forma de self (objeto: Biblioteca)
         # Le pide al usuario una serie de datos para modificar dicha entrada den la lista y, si el proceso se lleva a cabo bien,
         # devuelve True y modifica la entrada en la lista, en caso contrario devuelve False.
 
@@ -239,7 +377,7 @@ class Biblioteca:
 
 
     def buscar_libro ( self ):
-        # Función que tiene como parámetros una [lista_de_libros]
+        # Función que tiene como parámetros una [lista_de_libros] >> self == objeto del tipo Biblioteca (que es una lista de objetos tipo Libro)
         # Dependiendo de la entrada del usuario le ofrece una información u otra de la biblioteca [lista_de_libros]
 
         salir = False

@@ -1,0 +1,63 @@
+class Libro:
+    def __init__(self, titulo, autor):
+        self.titulo = titulo
+        self.autor = autor
+        self.disponible = True
+
+    def __str__(self):
+        return f"{self.titulo} ({self.autor})"
+
+
+class Usuario:
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self.libros_prestados = []
+
+    def depositar_libro(self, libro, biblioteca):
+        if libro in self.libros_prestados:
+            self.libros_prestados.remove(libro)
+            biblioteca.agregar_libro(libro)
+            libro.disponible = True
+            print(f"{self.nombre} ha depositado '{libro.titulo}' en la biblioteca.")
+        else:
+            print(f"{self.nombre} no tiene el libro '{libro.titulo}'.")
+
+    def retirar_libro(self, libro, biblioteca):
+        if libro in biblioteca.libros and libro.disponible:
+            biblioteca.eliminar_libro(libro)
+            self.libros_prestados.append(libro)
+            libro.disponible = False
+            print(f"{self.nombre} ha retirado '{libro.titulo}'.")
+        else:
+            print(f"El libro '{libro.titulo}' no está disponible.")
+
+
+class Biblioteca:
+    def __init__(self):
+        self.libros = []
+
+    def mostrar_libros(self):
+        if not self.libros:
+            print("No hay libros en la biblioteca.")
+        else:
+            print("Libros disponibles:")
+            for libro in self.libros:
+                estado = "Disponible" if libro.disponible else "Prestado"
+                print(f"- {libro.titulo} ({estado})")
+
+
+# Ejemplo de uso
+lib1 = Libro("1984", "George Orwell")
+lib2 = Libro("Cien años de soledad", "Gabriel García Márquez")
+
+biblio = Biblioteca()
+biblio.agregar_libro(lib1)
+biblio.agregar_libro(lib2)
+
+usuario1 = Usuario("Ana")
+
+biblio.mostrar_libros()
+usuario1.retirar_libro(lib1, biblio)
+biblio.mostrar_libros()
+usuario1.depositar_libro(lib1, biblio)
+biblio.mostrar_libros()
